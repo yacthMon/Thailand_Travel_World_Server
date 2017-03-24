@@ -1,12 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2015
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thailand Travel World", "Thailand Travel World.csproj", "{7199A46D-F3AC-77AE-6434-87F5A9CD20AB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Thailand Travel World.Editor", "Thailand Travel World.Editor.csproj", "{81DC3557-4757-5CC0-174D-860D4806F431}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7199A46D-F3AC-77AE-6434-87F5A9CD20AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7199A46D-F3AC-77AE-6434-87F5A9CD20AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7199A46D-F3AC-77AE-6434-87F5A9CD20AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7199A46D-F3AC-77AE-6434-87F5A9CD20AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81DC3557-4757-5CC0-174D-860D4806F431}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81DC3557-4757-5CC0-174D-860D4806F431}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81DC3557-4757-5CC0-174D-860D4806F431}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81DC3557-4757-5CC0-174D-860D4806F431}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
