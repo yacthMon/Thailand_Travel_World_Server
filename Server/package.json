@@ -5,9 +5,11 @@
   "main": "server.js",
   "dependencies": {
     "blessed": "^0.1.81",
-    "dgt-net": "^1.1.0",
     "chai": "^4.0.2",
-    "mocha": "^3.4.2"
+    "dgt-net": "^1.1.0",
+    "md5": "^2.2.1",
+    "mocha": "^3.4.2",
+    "mongodb": "^2.2.31"
   },
   "scripts": {
     "start": "node server.js",
