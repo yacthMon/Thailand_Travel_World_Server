@@ -1,5 +1,4 @@
 let mongo = require('mongodb').MongoClient;
-// let monitor = require('../server').monitor;
 let md5 = require('md5');
 let config = {
     ip: "188.166.208.125",
@@ -32,64 +31,70 @@ class mongoDB {
                 mongo.connect("mongodb://" + config.user + ":" + config.password + "@" + config.ip + ":" + config.port + "/" + config.db + "?authMechanism=DEFAULT&authSource=" + config.db)
                     .then((database) => {
                         _this.db = database;
-                        resolve();
+                        resolve(true);
                     }, (err) => {
-                        console.log("Error connecting to database : " + err.message);
+                        // console.log("Error connecting to database : " + err.message);
                         reject(err.message);
                     }
                     );
             }
         })
-        // async
-        // if (_this.db) {
-        //     return;
-        // } else {
-        //     try {
-        //         await mongo.connect("mongodb://" + config.user + ":" + config.password + "@" + config.ip + ":" + config.port + "/" + config.db + "?authMechanism=DEFAULT&authSource=" + config.db)
-        //             .then((database) => {
-        //                 _this.db = database;
-        //                 resolve();
-        //             }, (err) => {
-        //                 monitor.log("Error connecting to database : " + err.message);
-        //                 reject(err.message);
-        //             }
-        //             );
-        //     } catch (error) {
-        //         console.error(error.message);
-        //     }
-        // }
-
     }
 
     close() {
         this.db.close();
+        // delete this;
     }
 
-    isAccountIdExist(id) {
-
+    async getAccountById(id) {
+        return new Promise((resolve, reject) => {
+            this.db.findOne({ _id: id }, (err, data) => {
+                if (err) { reject(err); return; }
+                resolve(data);
+            })
+        });
     }
 
-    getAccountById(id) {
-
+    async getAccountByCustom(specify) {
+        return new Promise((resolve, reject) => {
+            this.db.findOne(specify, (err, data) => {
+                if (err) { reject(err); return; }
+                resolve(data);
+            })
+        });
     }
 
-    async addAccount(id, username, password, callback) {
-        let lastestId = await this.getNextID();
-        let data = {
-            _id: lastestId,
-            Username: username,
-            Password: md5(password),
-            Information: null,
-            Character: null,
-            Checkin: null,
-            Friends: null
-        };
-        console.log("Ready to put data");
-        this.db.collection("TTW").insertOne(data, (err, res) => {
-            if (err) { callback(err); return; }
-            callback(res);
-        })
+    async addAccount(username, password, email, gender) {
+        return new  Promise(async (resolve, reject) => {
+            if (!await this.isUsernameExist(username)) {
+                let lastestId = await this.getNextID();
+                let data = {
+                    _id: lastestId,
+                    Username: username,
+                    Password: password,
+                    Email: email,
+                    Gender: gender,
+                    Character: null,
+                    Checkin: null,
+                    Friends: null
+                };
+                this.db.collection("TTW").insertOne(data, (err, res) => {
+                    if (err) { reject(err); return; }
+                    resolve(undefined, res);
+                })
+            } else {
+                resolve("Username already exist.");
+            }
+        });
+    }
 
+    async isUsernameExist(username) {
+        return new Promise((resolve, reject) => {
+            this.db.collection("TTW").findOne({ Username: username }, (err, data) => {
+                if (err) { reject(err); return; }
+                resolve(data ? true : false);
+            })
+        });
     }
 
     async getNextID() {
@@ -101,37 +106,40 @@ class mongoDB {
                 }
             );
         });
-        // return this.db ? "yep" : "noh";        
-        // let id = this.db.collection("counter").findAndModify(
-        //     { _id: "userid" }, [], { $inc: { seq: 1 } }, { new: true }, (err, data) => {
-        //         // console.log("YY")
-        //         if (err) { console.log(err); return; }
-        //         return data;
-        //     }
-        // );
-        // return await id;
-        // return id;
+    }
 
-        // this.connect((err,db)=>{
-        //     if(err){ callback(err,undefined); return;}
-        //     callback(db.collection("counter").findAndModify(
-        //         {
-        //           query: { _id: "userid" },
-        //           update: { $inc: { seq: 1 } },
-        //           new: true
-        //         }
-        //     ))
-        // })        
+    async doLogin(username, password) {
+        return new Promise((resolve, reject) => {
+            this.db.collection("TTW").findOne({ Username: username }, (err, user) => {
+                if (err) { reject(err); return; }
+                if (user) {
+                    //found user
+                    // console.log(user);
+                    if (password === user.Password) {
+                        resolve(true); // Access Grant
+                    } else {
+                        resolve(false); // wrong password
+                    }
 
+                } else {
+                    resolve(false);// username not found
+                }
+            })
+        });
     }
 }
+
 module.exports = mongoDB;
+
+/*
 let dbTest = new mongoDB();
 // dbTest.connect().then(()=>{dbTest.getNextID();},()=>{});
 
-let doTest = () => {
-    dbTest.getNextID().then((v) => { console.log(v) });
-    dbTest.addAccount(0, "yacthMon", "0000", res => { console.log(res) })
-    console.log("TEAT");
+let doTest = async () => {
+    // dbTest.getNextID().then((v) => { console.log(v) });
+    // dbTest.addAccount("yacthMon", "1234", "yacthmon@protonmail.com","male",res => { console.log(res) })
+    // if (await dbTest.doLogin("yacthMon", md5("1234"))) { console.log("Login pass") } else { console.log("Login failed") }
+    console.log("Done Test");
 }
-dbTest.connect().then(doTest, () => { console.log("error"); });
+dbTest.connect().then(doTest, () => { console.log("Error while connecting"); });
+*/

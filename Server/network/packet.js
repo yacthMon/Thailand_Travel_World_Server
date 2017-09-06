@@ -11,7 +11,7 @@ var packet = {
   CS_REGISTER: 10010,
   CS_AUTHENTICATION: 10011,
   CS_UPDATE_PLAYERDATA: 10012,
-  CS_REQUEST_ENTER_WORLD: 10020,
+  CS_ENTER_WORLD: 10020,
   CS_PLAYER_MOVING: 10021,
   CS_EXIT_WORLD: 10022,
   CS_CHAT: 10023,
@@ -46,16 +46,18 @@ packet[packet.CS_CONNECTION] = function (remoteProxy, data) {
 
 }
 
-packet[packet.CS_PING] = function (remoteProxy, data) {
-  var pingTime = data.read_uint8();
+packet[packet.CS_PING] = function (remoteProxy, data) {  
   if (!data.completed()) return true;
-  //remoteProxy.ping(pingTime);
+  remoteProxy.ping(pingTime);
 }
 
 packet[packet.CS_REGISTER] = function (remoteProxy, data) {
-  var accountKey = data.read_string();
+  var username = data.read_string();
+  var password = data.read_string();
+  var email = data.read_string();
+  var gender = data.read_string();
   if (!data.completed()) return true;
-  remoteProxy.registerAccount(accountKey);
+  remoteProxy.registerAccount(username,password,email,gender);
 }
 
 packet[packet.CS_UPDATE_PLAYERDATA] = function (remoteProxy, data) {
@@ -67,10 +69,10 @@ packet[packet.CS_UPDATE_PLAYERDATA] = function (remoteProxy, data) {
 }
 
 packet[packet.CS_AUTHENTICATION] = function (remoteProxy, data) {
-  var deviceId = data.read_string();
-  var name = data.read_string();
+  var username = data.read_string();
+  var password = data.read_string();
   if (!data.completed()) return true;
-  remoteProxy.authentication(deviceId,name);
+  remoteProxy.authentication(username,password);
 }
 
 packet[packet.CS_PLAYER_MOVING] = function (remoteProxy, data) {
@@ -129,19 +131,18 @@ packet.make_connection = function (msg) {
   return o.buffer;
 }
 
-packet.make_ping = function (ping_time) {
-  var o = new packet_writer(packet.SC_PING);
-  o.append_uint8(ping_time);
+packet.make_ping_success = function () {
+  var o = new packet_writer(packet.SC_PING_SUCCESS);  
   o.finish();
   return o.buffer;
 }
 
 packet.make_authentication_grant = function (uid,color,highest_level,highest_checkpoint) {
   var o = new packet_writer(packet.SC_AUTHENTICATION_GRANT);
-  o.append_uint32(uid);
+  /*o.append_uint32(uid);
   o.append_uint8(color);
   o.append_uint16(highest_level);
-  o.append_uint16(highest_checkpoint);
+  o.append_uint16(highest_checkpoint);*/
   /*o.append_uint32(uid);
   o.append_string(name);
   o.append_uint16(floor);
@@ -155,19 +156,15 @@ packet.make_authentication_grant = function (uid,color,highest_level,highest_che
   o.finish();
   return o.buffer;
 }
-packet.make_register_success = (uid,color,highest_level,highest_checkpoint)=>{
+packet.make_register_success = ()=>{
   let o = new packet_writer(packet.SC_REGISTER_SUCCESS);
-  o.append_uint32(uid);
-  o.append_uint8(color);
-  o.append_uint16(highest_level);
-  o.append_uint16(highest_checkpoint);
+
   o.finish();
   return o.buffer;
 }
 packet.make_register_failed = (errCode,msg)=>{
   let o = new packet_writer(packet.SC_REGISTER_FAILED);
-  o.append_uint16(errCode);
-  o.append_string(msg);
+
   o.finish();
   return o.buffer;
 }

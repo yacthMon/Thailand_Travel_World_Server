@@ -10,11 +10,11 @@ world.startQueueResponse();
 exports.world = world;
 */
 let server = require('dgt-net').server;
-let packet = require('./network/packet');
-let remoteProxy = require('./network/remoteproxy');
+let packet;// = require('./network/packet');
+let remoteProxy;// = require('./network/remoteproxy');
+let db;
 let config = require("./package");
 let mongoDB = require("./models/databaseManage");
-
 let port = 21200;
 let runningCheck = ["|", "/", "-", "\\"]
 let indexRunning = 0;
@@ -30,7 +30,7 @@ monitor.info("|| Thailand Travel World server  ");
 monitor.info("|| Server Side v" + config.version);
 monitor.info("|| Server port         : " + port);
 monitor.info("========================================");
-let db = new mongoDB((err) => {  
+db = new mongoDB((err) => {  
   if (!err) {
     monitor.log("Database server connection          [{green-fg}OK{/green-fg}]");
   } else {
@@ -48,6 +48,10 @@ db.connect().then(()=>{
 },()=>{
   monitor.log("Database class create connect       [{red-fg}FAILED{/red-fg}]");
 });
+exports.db = db;
+packet = require('./network/packet');
+remoteProxy = require('./network/remoteproxy');
 server.setRemoteProxyClass(remoteProxy.RemoteProxy);
 server.setPacketObject(packet);
 server.listen(port);
+ 

@@ -2,6 +2,7 @@ let server = require('dgt-net').server;
 //let db = require('./database-control');
 let packet = require('./packet');
 let monitor = require('../server').monitor;
+let db = require("../server").db;
 //let world = require('./index').world;
 let clientCount=0;
 let account = [];
@@ -13,54 +14,59 @@ class RemoteProxy extends server.RemoteProxy {
 
   initProperties(){
     this.accountKey = "";
-    this.uid = 0;
-    this.name = "";
-    this.position = {x:0,y:0};
-    this.point = 0;
-    this.floor = 1;
-    this.color = 1;
-    this.receiveList = []; // stored UID only
+    this.username = "";
+    this.id = 0;        
   }
 
   onConnected() {
-    monitor.log("RemoteProxy There is a connection from " + this.getPeerName())
+    monitor.log("[RemoteProxy] There is a connection from " + this.getPeerName())
     clientCount++;
     this.initProperties();
   }
 
   onDisconnected() {
-    monitor.log("RemoteProxy Disconnected from " + this.getPeerName())
+    monitor.log("[RemoteProxy] Disconnected from " + this.getPeerName())
     clientCount--;
   }
 
-  ping(pingTime) {
-    monitor.log('RemoteProxy ping: ' + pingTime)
-    this.send(packet.make_ping_success(pingTime))
+  ping() {
+    // monitor.log('[RemoteProxy] ping: ' + pingTime)
+    this.send(packet.make_ping_success())
   }
 
-  registerAccount(accountKey, name){
-      // this.uid = account.length;
-      // account[this.uid] = accountKey;
-
-      // db.registerAccount(accountKey,(result)=>{
-      //     if(result.affectedRows == 1){
-      //     this.uid = result.insertId;
-      //     monitor.debug("New Account for this user");
-      //     monitor.debug('Account Key  : ' + this.accountKey);
-      //     monitor.debug('Name : ' + this.name);
-      //     monitor.debug('UID : ' + this.uid);
-      //     monitor.log(this.getPeerName() + " has register as UID " + this.uid);
-      //     this.send(packet.make_register_success(this.uid,1,1,1)); //color,level,checkpoint
-      //     return;
-      //   } else {
-      //     this.send(packet.make_register_failed(0,"unknow error"));
-      //     return;
-      //   }
-      // })
+  async registerAccount(username, password,email,gender){
+      db.addAccount(username,password,email,gender).then((err,res)=>{
+        if(err){
+          monitor.log("Register failed : " + err);           
+          this.send(packet.make_register_failed());
+          return;
+        }else{
+          monitor.log("Registing success for Username ['" + username +"']" )
+          this.send(packet.make_register_success());
+          return;
+        }        
+      },(err)=>{
+        monitor.log("Error while registing account " + err);
+      });
+      // monitor.log(username);
+      // monitor.log(password);
+      // monitor.log(email);
+      // monitor.log(gender);
   }
 
-  authentication(accountKey,name) {
-    // monitor.debug('Client request authentication')
+  async authentication(username,password) {
+    monitor.debug('Client request authentication')
+    if(db)
+    if(await db.doLogin(username,password)){
+      monitor.debug('Client access grant [ login as : \'' + username +'\']');
+      this.username = username;
+      this.send(packet.make_authentication_grant());
+    } else {
+      monitor.debug('Client access denied [try to login as : \''+ username +'\']');
+      this.send(packet.make_authentication_denied(102,error[102]));
+    }
+    else
+      monitor.log("No DB :(");
     // this.name = name;
     // this.accountKey = accountKey;
     //
