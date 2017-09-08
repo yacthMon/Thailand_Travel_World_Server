@@ -12,8 +12,11 @@ exports.world = world;
 let server = require('dgt-net').server;
 let packet;// = require('./network/packet');
 let remoteProxy;// = require('./network/remoteproxy');
+///////// Database
 let db;
-let config = require("./package");
+let config = require('./config');
+///////// Database
+let package = require("./package");
 let mongoDB = require("./models/databaseManage");
 let port = 21200;
 let runningCheck = ["|", "/", "-", "\\"]
@@ -27,10 +30,11 @@ let status = setInterval(function () {
 monitor.info("========================================");
 monitor.info("|| King Mongkut University of Technology Thonburi");
 monitor.info("|| Thailand Travel World server  ");
-monitor.info("|| Server Side v" + config.version);
+monitor.info("|| Server Side v" + package.version);
 monitor.info("|| Server port         : " + port);
+monitor.info("|| Database Server     : " + config.Database.ip);
 monitor.info("========================================");
-db = new mongoDB((err) => {  
+db = new mongoDB(config.Database,(err) => {  
   if (!err) {
     monitor.log("Database server connection          [{green-fg}OK{/green-fg}]");
   } else {

@@ -1,15 +1,9 @@
 let mongo = require('mongodb').MongoClient;
 let md5 = require('md5');
-let config = {
-    ip: "188.166.208.125",
-    port: "27017",
-    user: "TTW",
-    password: "thailandTravelworld",
-    db: "TTW"
-}
 class mongoDB {
-    constructor(callback) {
-        mongo.connect("mongodb://" + config.user + ":" + config.password + "@" + config.ip + ":" + config.port + "/" + config.db + "?authMechanism=DEFAULT&authSource=" + config.db, (err, db) => {
+    constructor(config,callback) {
+        this.config = config;
+        mongo.connect("mongodb://" + config.user + ":" + config.password + "@" + config.ip + ":" + config.port + "/" + config.database + "?authMechanism=DEFAULT&authSource=" + config.database, (err, db) => {
             if (err) { callback ? callback(err) : ''; return; }
             if (callback) callback();
             db.close();
@@ -27,8 +21,8 @@ class mongoDB {
         return new Promise((resolve, reject) => {
             if (_this.db) {
                 resolve();
-            } else {
-                mongo.connect("mongodb://" + config.user + ":" + config.password + "@" + config.ip + ":" + config.port + "/" + config.db + "?authMechanism=DEFAULT&authSource=" + config.db)
+            } else {                
+                mongo.connect("mongodb://" + this.config.user + ":" + this.config.password + "@" + this.config.ip + ":" + this.config.port + "/" + this.config.database + "?authMechanism=DEFAULT&authSource=" + this.config.database)
                     .then((database) => {
                         _this.db = database;
                         resolve(true);
@@ -132,7 +126,7 @@ class mongoDB {
 module.exports = mongoDB;
 
 /*
-let dbTest = new mongoDB();
+let dbTest = new mongoDB(config.Database);
 // dbTest.connect().then(()=>{dbTest.getNextID();},()=>{});
 
 let doTest = async () => {
@@ -141,5 +135,5 @@ let doTest = async () => {
     // if (await dbTest.doLogin("yacthMon", md5("1234"))) { console.log("Login pass") } else { console.log("Login failed") }
     console.log("Done Test");
 }
-dbTest.connect().then(doTest, () => { console.log("Error while connecting"); });
+dbTest.connect().then(doTest, (err) => { console.log("Error while connecting : " + err); });
 */
