@@ -68,9 +68,9 @@ class mongoDB {
                     Password: password,
                     Email: email,
                     Gender: gender,
-                    Characters: null,
-                    Checkin: null,
-                    Friends: null
+                    Characters: [],
+                    Checkin: [],
+                    Friends: []
                 };
                 this.db.collection("TTW").insertOne(data, (err, res) => {
                     if (err) { reject(err); return; }

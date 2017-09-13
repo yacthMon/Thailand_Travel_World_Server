@@ -73,14 +73,17 @@ class RemoteProxy extends server.RemoteProxy {
   }
 
   async checkCharacterName(characterName) {
-    if (!await isCharacterNameExist(characterName)) {
+    if (!await db.isCharacterNameExist(characterName)) {
+      monitor.debug("Name '" + characterName + "' is available ");
       this.send(packet.make_character_name_available());
+      
     } else {
+      monitor.debug("Name '" + characterName + "' is already exist. ");
       this.send(packet.make_character_name_already_used());
     }
   }
-
-  async createChracter(name, gender, job) {
+        
+  async createCharacter(name, gender, job) {
     let data = {
       Name: name,
       Status: {
@@ -109,11 +112,13 @@ class RemoteProxy extends server.RemoteProxy {
         Gold : 100,
         Items : []
       }
-    };
+    };    
     let result = await db.createCharacter(this.userdata._id, data);
     if(result){
+      monitor.debug("Characterd created");
       this.send(packet.make_character_create_success(result));
     } else {
+      monitor.debug("Failed to create character");
       this.send(packet.make_character_create_failed());
     }
   }

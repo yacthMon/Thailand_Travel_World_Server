@@ -79,7 +79,7 @@ packet[packet.CS_AUTHENTICATION] = function (remoteProxy, data) {
 packet[packet.CS_CHECK_CHARACTER_NAME] = function(remoteProxy,data){
   let characterName = data.read_string();
   if (!data.completed()) return true; 
-  remoteProxy.checkCharacterName(name);
+  remoteProxy.checkCharacterName(characterName);
 }
 
 packet[packet.CS_UPDATE_ACCOUNTDATA] = function (remoteProxy, data) {
@@ -221,29 +221,29 @@ packet.make_account_data = (data) => {
   return o.buffer;
 }
 
-packet.make_character_name_available = function(){
+packet.make_character_name_available = ()=>{
   let o =new packet_writer(packet.SC_CHARACTER_NAME_AVAILABLE);
   o.finish();
-  return o; 
+  return o.buffer; 
 }
 
 packet.make_character_name_already_used = function(){
-  let o =new packet_writer(packet.SC_CHARACTER_NAME_ALREADY_USED);
+  let o = new packet_writer(packet.SC_CHARACTER_NAME_ALREADY_USED);
   o.finish();
-  return o;
+  return o.buffer;
 }
 
 packet.make_character_create_success = function(character){
   let o =new packet_writer(packet.SC_CHARACTER_CREATE_SUCCESS);
-  o = this.convertCharacterDataToPacketData(o, character);
+  o = convertCharacterDataToPacketData(o, character);
   o.finish();
-  return o;
+  return o.buffer;
 }
 
 packet.make_character_create_failed = function(){
   let o =new packet_writer(packet.SC_CHARACTER_CREATE_FAILED);
   o.finish();
-  return o;
+  return o.buffer;
 }
 
 packet.make_multiplayer_connect = function (uid, name, position, color) {
