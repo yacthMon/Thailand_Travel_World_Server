@@ -60,7 +60,7 @@ class RemoteProxy extends server.RemoteProxy {
     if (db) {
       this.userdata = await db.doLogin(username, password);
       if (this.userdata) {
-        monitor.debug('Client access grant [ login as : \'' + username + '\']');        
+        monitor.debug('Client access grant [ login as : \'' + username + '\']');
         // monitor.log(JSON.stringify(this.userdata));
         this.send(packet.make_authentication_grant());
         this.send(packet.make_account_data(this.userdata));
@@ -70,6 +70,52 @@ class RemoteProxy extends server.RemoteProxy {
       }
     } else
       monitor.log("Error : No DB :(");
+  }
+
+  async checkCharacterName(characterName) {
+    if (!await isCharacterNameExist(characterName)) {
+      this.send(packet.make_character_name_available());
+    } else {
+      this.send(packet.make_character_name_already_used());
+    }
+  }
+
+  async createChracter(name, gender, job) {
+    let data = {
+      Name: name,
+      Status: {
+        Gender: gender,
+        Job: job,
+        Level: 1,
+        EXP: 0,
+        HP: 100,
+        SP: 50,
+        MaxHP: 100,
+        MaxSP: 50,
+        ATK: 20,
+        DEF: 5,
+        Equipment: {
+          Head: 1111,
+          Body: 2222,
+          Weapon: 3333
+        }
+      },
+      Location : {
+        Map:"Bangkok",
+        X:0,
+        Y:0,
+      },
+      Inventory : {
+        Gold : 100,
+        Items : []
+      }
+    };
+    let result = await db.createCharacter(this.userdata._id, data);
+    if(result){
+      this.send(packet.make_character_create_success(result));
+    } else {
+      this.send(packet.make_character_create_failed());
+    }
   }
 
   updateAccountData(color, highest_level, highest_checkpoint) {

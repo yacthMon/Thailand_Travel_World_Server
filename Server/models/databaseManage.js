@@ -122,6 +122,25 @@ class mongoDB {
             })
         });
     }
+
+    async isCharacterNameExist(username) {
+        return new Promise((resolve, reject) => {
+            this.db.collection("TTW").findOne({ "Characters.Name":username}, (err, data) => {
+                if (err) { reject(err); return; }
+                resolve(data ? true : false);
+            })
+        });
+    }
+
+    async createCharacter(userid,characterData){
+        return new Promise((resolve,reject)=>{
+            this.db.collection("TTW").update({_id:userid}, {$push : {"Characters":characterData}}, (err,data)=>{
+                if(err) {reject(err); return;}
+                resolve(data.result.n > 0 ? characterData : false );
+            })
+        })
+    }
+
 }
 
 module.exports = mongoDB;
@@ -133,7 +152,9 @@ let dbTest = new mongoDB(config.Database);
 let doTest = async () => {
     // dbTest.getNextID().then((v) => { console.log(v) });
     // dbTest.addAccount("yacthMon", "1234", "yacthmon@protonmail.com","male",res => { console.log(res) })
-    if (await dbTest.doLogin("yacthMon", md5("1234"))) { console.log("Login pass") } else { console.log("Login failed") }
+    //if (await dbTest.doLogin("yacthMon", md5("1234"))) { console.log("Login pass") } else { console.log("Login failed") }
+    // console.log(await dbTest.isCharacterNameExist("242"))
+    // console.log(await dbTest.createCharacter(1, {"testCreate":"555", testPure : {Title : "So pure", Detail : 5555}}));
     console.log("Done Test");
 }
 dbTest.connect().then(doTest, (err) => { console.log("Error while connecting : " + err); });

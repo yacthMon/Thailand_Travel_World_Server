@@ -16,7 +16,8 @@ let remoteProxy;// = require('./network/remoteproxy');
 let db;
 let config = require('./config');
 ///////// Database
-let package = require("./package");
+
+let package = require('./package');
 let mongoDB = require("./models/databaseManage");
 let port = 21200;
 let runningCheck = ["|", "/", "-", "\\"]
@@ -58,3 +59,25 @@ remoteProxy = require('./network/remoteproxy');
 server.setRemoteProxyClass(remoteProxy.RemoteProxy);
 server.setPacketObject(packet);
 server.listen(port);
+
+monitor.log("             .,-:;//;:=,");
+monitor.log("         . :H@@@MM@M#H/.,+%;,");
+monitor.log("      ,/X+ +M@@M@MM%=,-%HMMM@X/,");
+monitor.log("     -+@MM; $M@@MH+-,;XMMMM@MMMM@+-");
+monitor.log("    ;@M@@M- XM@X;. -+XXXXXHHH@M@M#@/.");
+monitor.log("  ,%MM@@MH ,@%=            .---=-=:=,.");
+monitor.log("  -@#@@@MX .,              -%HX$$%%%+;");
+monitor.log(" =-./@M@M$                  .;@MMMM@MM:");
+monitor.log(" X@/ -$MM/                    .+MM@@@M$");
+monitor.log(",@M@H: :@:                    . -X#@@@@-");
+monitor.log(",@@@MMX, .                    /H- ;@M@M=");
+monitor.log(".H@@@@M@+,                    %MM+..%#$.");
+monitor.log(" /MMMM@MMH/.                  XM@MH; -;");
+monitor.log("  /%+%$XHH@$=              , .H@@@@MX,");
+monitor.log("   .=--------.           -%H.,@@@@@MX,");
+monitor.log("   .%MM@@@HHHXX$$$%+- .:$MMX -M@@MM%.");
+monitor.log("     =XMMM@MM@MM#H;,-+HMM@M+ /MMMX=");
+monitor.log("       =%@M@M#@$-.=$@MM@@@M; %M%=");
+monitor.log("         ,:+$+-,/H#MMMMMMM@- -,");
+monitor.log("               =++%%%%+/:-.");
+
