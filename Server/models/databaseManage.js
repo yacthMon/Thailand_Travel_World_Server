@@ -68,7 +68,7 @@ class mongoDB {
                     Password: password,
                     Email: email,
                     Gender: gender,
-                    Character: null,
+                    Characters: null,
                     Checkin: null,
                     Friends: null
                 };
@@ -110,9 +110,10 @@ class mongoDB {
                     //found user
                     // console.log(user);
                     if (password === user.Password) {
-                        resolve(true); // Access Grant
+                        // resolve(true); // Access Grant
+                        resolve(user)//Access grant
                     } else {
-                        resolve(false); // wrong password
+                        resolve(undefined); // wrong password
                     }
 
                 } else {
@@ -124,16 +125,16 @@ class mongoDB {
 }
 
 module.exports = mongoDB;
-
 /*
+let config = require("../config");
 let dbTest = new mongoDB(config.Database);
 // dbTest.connect().then(()=>{dbTest.getNextID();},()=>{});
 
 let doTest = async () => {
     // dbTest.getNextID().then((v) => { console.log(v) });
     // dbTest.addAccount("yacthMon", "1234", "yacthmon@protonmail.com","male",res => { console.log(res) })
-    // if (await dbTest.doLogin("yacthMon", md5("1234"))) { console.log("Login pass") } else { console.log("Login failed") }
+    if (await dbTest.doLogin("yacthMon", md5("1234"))) { console.log("Login pass") } else { console.log("Login failed") }
     console.log("Done Test");
 }
 dbTest.connect().then(doTest, (err) => { console.log("Error while connecting : " + err); });
-*/
+// */

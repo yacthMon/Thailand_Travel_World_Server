@@ -58,4 +58,3 @@ remoteProxy = require('./network/remoteproxy');
 server.setRemoteProxyClass(remoteProxy.RemoteProxy);
 server.setPacketObject(packet);
 server.listen(port);
- 
