@@ -2,13 +2,13 @@
 let Monitor = require("./monitor");
 let monitor = new Monitor();
 exports.monitor = monitor;
-
-/*let World = require(' ./world')
+/*
+let World = require('./models/world')
 let world = new World()
 world.responseTime = 100;
 world.startQueueResponse();
 exports.world = world;
-*/
+// */
 let server = require('dgt-net').server;
 let packet;// = require('./network/packet');
 let remoteProxy;// = require('./network/remoteproxy');

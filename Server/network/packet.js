@@ -183,16 +183,17 @@ packet.make_authentication_grant = function (uid, color, highest_level, highest_
   return o.buffer;
 }
 
-packet.make_register_success = () => {
+packet.make_register_success = (username) => {
   let o = new packet_writer(packet.SC_REGISTER_SUCCESS);
-
+  o.append_string(username);
   o.finish();
   return o.buffer;
 }
 
 packet.make_register_failed = (errCode, msg) => {
   let o = new packet_writer(packet.SC_REGISTER_FAILED);
-
+  o.append_int8(errCode);
+  o.append_string(msg);
   o.finish();
   return o.buffer;
 }

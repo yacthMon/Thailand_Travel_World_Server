@@ -77,7 +77,8 @@ class mongoDB {
                     resolve(undefined, res);
                 })
             } else {
-                resolve("Username already exist.");
+                //err codde username already exist.
+                resolve(100);
             }
         });
     }
@@ -113,19 +114,19 @@ class mongoDB {
                         // resolve(true); // Access Grant
                         resolve(user)//Access grant
                     } else {
-                        resolve(undefined); // wrong password
+                        resolve(101); // wrong password
                     }
 
                 } else {
-                    resolve(false);// username not found
+                    resolve(undefined);// username not found
                 }
             })
         });
     }
 
-    async isCharacterNameExist(username) {
+    async isCharacterNameExist(name) {
         return new Promise((resolve, reject) => {
-            this.db.collection("TTW").findOne({ "Characters.Name":username}, (err, data) => {
+            this.db.collection("TTW").findOne({ "Characters.Name":name}, (err, data) => {
                 if (err) { reject(err); return; }
                 resolve(data ? true : false);
             })
@@ -153,7 +154,7 @@ let doTest = async () => {
     // dbTest.getNextID().then((v) => { console.log(v) });
     // dbTest.addAccount("yacthMon", "1234", "yacthmon@protonmail.com","male",res => { console.log(res) })
     //if (await dbTest.doLogin("yacthMon", md5("1234"))) { console.log("Login pass") } else { console.log("Login failed") }
-    // console.log(await dbTest.isCharacterNameExist("242"))
+    // console.log(await dbTest.isCharacterNameExist("เทพซ่าส์"))
     // console.log(await dbTest.createCharacter(1, {"testCreate":"555", testPure : {Title : "So pure", Detail : 5555}}));
     console.log("Done Test");
 }

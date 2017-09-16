@@ -7,9 +7,9 @@ let db = require("../server").db;
 let clientCount = 0;
 let account = [];
 let error = {
-  100: "Account already exits",
-  101: "Account not found",
-  102: "Account data not found"
+  100: "Username already exist.",
+  101: "Invalid username or password.",
+  102: "Account data not found."
 };
 // What to do on Server-side
 class RemoteProxy extends server.RemoteProxy {
@@ -17,6 +17,7 @@ class RemoteProxy extends server.RemoteProxy {
   initProperties() {
     this.accountKey = "";
     this.userdata = undefined;
+    this.location = {position:{x:0,y:0}, map:"none"};    
   }
 
   onConnected() {
@@ -39,15 +40,16 @@ class RemoteProxy extends server.RemoteProxy {
     db.addAccount(username, password, email, gender).then((err, res) => {
       if (err) {
         monitor.log("Register failed : " + err);
-        this.send(packet.make_register_failed());
+        this.send(packet.make_register_failed(err, error[err]));
         return;
       } else {
         monitor.log("Registing success for Username ['" + username + "']")
-        this.send(packet.make_register_success());
+        this.send(packet.make_register_success(username));
         return;
       }
     }, (err) => {
       monitor.log("Error while registing account " + err);
+      this.send(packet.make_register_failed(0, err));
     });
     // monitor.log(username);
     // monitor.log(password);
@@ -58,14 +60,20 @@ class RemoteProxy extends server.RemoteProxy {
   async authentication(username, password) {
     monitor.debug('Client [' + this.getPeerName() + ']  request authentication')
     if (db) {
-      this.userdata = await db.doLogin(username, password);
-      if (this.userdata) {
-        monitor.debug('Client access grant [ login as : \'' + username + '\']');
-        // monitor.log(JSON.stringify(this.userdata));
-        this.send(packet.make_authentication_grant());
-        this.send(packet.make_account_data(this.userdata));
+      let loginResult = await db.doLogin(username, password);
+      if (loginResult) {        
+        if (typeof(loginResult) === "number") {
+          monitor.debug('Client access denied [try to login as \'' + username + '\']');
+          this.send(packet.make_authentication_denied(loginResult, error[loginResult]));
+        } else {
+          monitor.debug('Client access grant [ login as : \'' + username + '\']');
+          // monitor.log(JSON.stringify(loginResult));
+          this.userdata = loginResult;
+          this.send(packet.make_authentication_grant());
+          this.send(packet.make_account_data(loginResult));          
+        }
       } else {
-        monitor.debug('Client access denied [try to login as : \'' + username + '\']');
+        monitor.debug('Client access denied [try to login as not exist username \'' + username + '\']');
         this.send(packet.make_authentication_denied(102, error[102]));
       }
     } else
@@ -76,13 +84,13 @@ class RemoteProxy extends server.RemoteProxy {
     if (!await db.isCharacterNameExist(characterName)) {
       monitor.debug("Name '" + characterName + "' is available ");
       this.send(packet.make_character_name_available());
-      
+
     } else {
       monitor.debug("Name '" + characterName + "' is already exist. ");
       this.send(packet.make_character_name_already_used());
     }
   }
-        
+
   async createCharacter(name, gender, job) {
     let data = {
       Name: name,
@@ -103,18 +111,18 @@ class RemoteProxy extends server.RemoteProxy {
           Weapon: 3333
         }
       },
-      Location : {
-        Map:"Bangkok",
-        X:0,
-        Y:0,
+      Location: {
+        Map: "Bangkok",
+        X: 0,
+        Y: 0,
       },
-      Inventory : {
-        Gold : 100,
-        Items : []
+      Inventory: {
+        Gold: 100,
+        Items: []
       }
-    };    
+    };
     let result = await db.createCharacter(this.userdata._id, data);
-    if(result){
+    if (result) {
       monitor.debug("Characterd created");
       this.send(packet.make_character_create_success(result));
     } else {
