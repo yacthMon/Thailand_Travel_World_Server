@@ -14,7 +14,7 @@ let packet = {
   CS_CHECK_CHARACTER_NAME: 11013,
   CS_CREATE_CHARACTER: 11014,
   /* 12xxx for Multiplayer*/
-  CS_ENTER_WORLD: 12020,
+  CS_REQUEST_ENTER_WORLD: 12020,
   CS_PLAYER_MOVING: 12021,
   CS_EXIT_WORLD: 12022,
   CS_CHAT: 12023,
@@ -39,9 +39,9 @@ let packet = {
   SC_CHARACTER_CREATE_FAILED: 21018,
   /* 22xxx for Multiplayer*/
   SC_MULTIPLAYER_PLAYERS_IN_WORLD: 22020,
-  SC_MULTIPLAYER_CONNECT: 22021,
-  SC_MULTIPLAYER_CONTROL: 22022,
-  SC_MULTIPLAYER_DISCONNET: 22023,
+  SC_ONLINE_PLAYER_CONNECT: 22021,
+  SC_ONLINE_PLAYER_CONTROL: 22022,
+  SC_ONLINE_PLAYER_DISCONNECT: 22023,
   SC_CHAT: 22024,
   SC_NOTIFICATION: 22025,
 };
@@ -117,10 +117,9 @@ packet[packet.CS_PLAYER_MOVING] = function (remoteProxy, data) {
 }
 
 packet[packet.CS_REQUEST_ENTER_WORLD] = function (remoteProxy, data) {
-  let position = { x: data.read_float(), y: data.read_float() }
-  let color = data.read_uint16()
+  let characterName = data.read_string();  
   if (!data.completed()) return true;
-  remoteProxy.playerEnterWorld(position, color);
+  remoteProxy.playerEnterWorld(characterName);
 }
 
 packet[packet.CS_EXIT_WORLD] = (remoteProxy, data) => {
@@ -248,7 +247,7 @@ packet.make_character_create_failed = function(){
 }
 
 packet.make_multiplayer_connect = function (uid, name, position, color) {
-  let o = new packet_writer(packet.SC_MULTIPLAYER_CONNECT);
+  let o = new packet_writer(packet.SC_ONLINE_PLAYER_CONNECT);
   o.append_uint32(uid);
   o.append_string(name);
   o.append_float(position.x);
@@ -259,7 +258,7 @@ packet.make_multiplayer_connect = function (uid, name, position, color) {
 }
 
 packet.make_multiplayer_control = function (datas) {
-  let o = new packet_writer(packet.SC_MULTIPLAYER_CONTROL);
+  let o = new packet_writer(packet.SC_ONLINE_PLAYER_CONTROL);
   o.append_uint16(datas.length); //add length first to tell client before loop
   for (let i = 0; i < datas.length; i++) {
     // UID, Name, HP,SP,Job,Level,Equipment,Position only
@@ -289,7 +288,7 @@ packet.make_multiplayer_in_world = function (players) {
 }
 
 packet.make_multiplayer_disconnect = function (uid) {
-  let o = new packet_writer(packet.SC_MULTIPLAYER_DISCONNET);
+  let o = new packet_writer(packet.SC_ONLINE_PLAYER_DISCONNECT);
   o.append_uint32(uid);
   o.finish();
   return o.buffer;

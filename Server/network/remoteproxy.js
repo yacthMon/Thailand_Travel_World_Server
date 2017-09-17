@@ -17,8 +17,19 @@ class RemoteProxy extends server.RemoteProxy {
   initProperties() {
     this.accountKey = "";
     this.userdata = undefined;
-    this.location = {position:{x:0,y:0}, map:"none"};
-    this.character = undefined;
+    this.location = undefined;//{ position: { x: 0, y: 0 }, map: "none" };
+    this.character = undefined;// Character that was choose by player
+    this.responseData = undefined;// response data for send to other player
+    /* Response data 
+            uid : user id,        
+            location : position(x,y) & currentMap,
+            HP : health point,
+            SP : Stamina point,
+            Level : level,
+            Equipment : Head & Weapon & Body
+            */
+    // static
+    // characterName : character name, Job : job,
   }
 
   onConnected() {
@@ -58,8 +69,8 @@ class RemoteProxy extends server.RemoteProxy {
     monitor.debug('Client [' + this.getPeerName() + ']  request authentication')
     if (db) {
       let loginResult = await db.doLogin(username, password);
-      if (loginResult) {        
-        if (typeof(loginResult) === "number") {
+      if (loginResult) {
+        if (typeof (loginResult) === "number") {
           monitor.debug('Client access denied [try to login as \'' + username + '\']');
           this.send(packet.make_authentication_denied(loginResult, error[loginResult]));
         } else {
@@ -67,7 +78,7 @@ class RemoteProxy extends server.RemoteProxy {
           // monitor.log(JSON.stringify(loginResult));
           this.userdata = loginResult;
           this.send(packet.make_authentication_grant());
-          this.send(packet.make_account_data(loginResult));          
+          this.send(packet.make_account_data(loginResult));
         }
       } else {
         monitor.debug('Client access denied [try to login as not exist username \'' + username + '\']');
@@ -137,11 +148,39 @@ class RemoteProxy extends server.RemoteProxy {
     // })
   }
 
-  playerEnterWorld(position, color) {
-    // this.position = position;
-    // this.color = color;  //-----
-    // monitor.log("UID : "+this.uid+" has enter world");
-    // world.addRemote(this);
+  playerEnterWorld(characterName) {
+    /* Response data 
+        uid : user id,        
+        location : position(x,y) & currentMap,
+        HP : health point,
+        SP : Stamina point,
+        Level : level,
+        Equipment : Head & Weapon & Body
+        */
+    // static
+    // characterName : character name, Job : job,
+    let characterIndex = this.userdata.Characters.findIndex((character) => { return character.Name == characterName });
+    if (characterIndex > -1) {
+      this.character = this.userdata.Characters[characterIndex]; // set choosed character
+      this.location = {
+        position: { x: this.character.Location.X, y: this.character.Location.Y },
+        map: this.character.Location.Map
+      };
+      this.responseData = {
+        uid: this.userdata._id,
+        location: this.location,
+        HP: this.character.Status.HP,
+        SP: this.character.Status.SP,
+        Level: this.character.Status.Level,
+        Equipment: this.character.Status.Equipment
+      }
+      monitor.log("Player choose character");
+      monitor.log(JSON.stringify(this.responseData));
+      // world.addRemote(this);
+      // this.send(packet.make_)
+    } else {
+      //Something wrong :( Can't find character that player choosed
+    }
   }
 
   playerExitWorld() {
