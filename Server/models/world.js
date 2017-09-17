@@ -8,12 +8,33 @@ class World {
         this.responseTime = 100;
         this.responseTimer = undefined;
         this.responseDatas = [];
+        /* Response data 
+        uid : user id,        
+        location : position(x,y) & currentMap,
+        HP : health point,
+        SP : Stamina point,
+        Level : level,
+        Equipment : Head & Weapon & Body
+        */
+        // static
+        // characterName : character name, Job : job,
     }
 
     addRemote(remote) {
         let playerInWorld = [];
         this.remotes.forEach((otherRemote) => { // stored players that already in world to playerInWorld array
-            playerInWorld.push({ "uid": otherRemote.uid, "location": otherRemote.location})
+            if (otherRemote.location.map === remote.location.map) { // if in same map
+                playerInWorld.push({
+                    "uid": otherRemote.uid,
+                    "CharacterName": otherRemote.character.Name,
+                    "location": otherRemote.location,
+                    "HP": hp,
+                    "SP": sp,
+                    "job": job,
+                    "level": level,
+                    "Equipment": equipment
+                })
+            }
         })
         remote.send(packet.make_multiplayer_in_world(playerInWorld)); // send playerInWorld to the client who just enter
         this.remotes.push(remote) // add this client to retmoes
@@ -71,7 +92,7 @@ class World {
                         //     tempDatas.push(data); // Add data that in distance to tempData;
                         // } else {//not in distance
                         // }
-                        if(otherPlayerData.location.map === remote.location.map ){ // if otherPlayer in same map
+                        if (otherPlayerData.location.map === remote.location.map) { // if otherPlayer in same map
                             dataToSend.push(otherPlayerData);
                         }
                     });
