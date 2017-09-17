@@ -13,7 +13,7 @@ class World {
     addRemote(remote) {
         let playerInWorld = [];
         this.remotes.forEach((otherRemote) => { // stored players that already in world to playerInWorld array
-            playerInWorld.push({ "uid": otherRemote.uid, "location": otherRemote.location, })
+            playerInWorld.push({ "uid": otherRemote.uid, "location": otherRemote.location})
         })
         remote.send(packet.make_multiplayer_in_world(playerInWorld)); // send playerInWorld to the client who just enter
         this.remotes.push(remote) // add this client to retmoes
@@ -65,16 +65,17 @@ class World {
                 // ---------------- AOI (Area of Interest) --------
                 this.remotes.forEach((remote) => { // for All remote in world
                     let position = remote.location.position; // get remote's current position;
-                    let tempDatas = [];
-                    this.responseDatas.forEach((data) => { // for All response
-                        if (Math.abs(position.x - data.position.x) <= AOIamount) { //Check if in distance
-                            tempDatas.push(data); // Add data that in distance to tempData;
-                        } else {//not in distance
-
+                    let dataToSend = [];
+                    this.responseDatas.forEach((otherPlayerData) => { // for All response data
+                        // if (Math.abs(position.x - data.position.x) <= AOIamount) { //Check if in distance
+                        //     tempDatas.push(data); // Add data that in distance to tempData;
+                        // } else {//not in distance
+                        // }
+                        if(otherPlayerData.location.map === remote.location.map ){ // if otherPlayer in same map
+                            dataToSend.push(otherPlayerData);
                         }
-
                     });
-                    remote.send(packet.make_multiplayer_control(tempDatas)); // send temp data to remote
+                    remote.send(packet.make_multiplayer_control(dataToSend)); // send temp data to remote
                 })
                 // ---------------- AOI (Area of Interest) --------
                 this.responseDatas = [];
