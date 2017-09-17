@@ -3,7 +3,7 @@ let server = require('dgt-net').server;
 let packet = require('./packet');
 let monitor = require('../server').monitor;
 let db = require("../server").db;
-//let world = require('./index').world;
+let world = require('../server').world;
 let clientCount = 0;
 let account = [];
 let error = {
@@ -174,9 +174,7 @@ class RemoteProxy extends server.RemoteProxy {
         Level: this.character.Status.Level,
         Equipment: this.character.Status.Equipment
       }
-      monitor.log("Player choose character");
-      monitor.log(JSON.stringify(this.responseData));
-      // world.addRemote(this);
+      world.addRemote(this);
       // this.send(packet.make_)
     } else {
       //Something wrong :( Can't find character that player choosed
