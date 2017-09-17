@@ -262,6 +262,7 @@ packet.make_multiplayer_control = function (datas) {
   let o = new packet_writer(packet.SC_MULTIPLAYER_CONTROL);
   o.append_uint16(datas.length); //add length first to tell client before loop
   for (let i = 0; i < datas.length; i++) {
+    // UID, Name, HP,SP,Job,Level,Equipment,Position only
     o.append_uint32(datas[i].uid);
     o.append_float(datas[i].position.x);
     o.append_float(datas[i].position.y);
@@ -332,8 +333,8 @@ function convertCharacterDataToPacketData(packet,character){
   //////////////////////////////////////////
   // Location
   packet.append_string(character.Location.Map);  // Current Map
-  packet.append_double(character.Location.X);    // X
-  packet.append_double(character.Location.Y);    // Y
+  packet.append_float(character.Location.X);    // X
+  packet.append_float(character.Location.Y);    // Y
   //////////////////////////////////////////
   // Inventory
   packet.append_int32(character.Inventory.Gold);   // Gold
