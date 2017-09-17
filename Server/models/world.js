@@ -14,7 +14,8 @@ class World {
         HP : health point,
         SP : Stamina point,
         Level : level,
-        Equipment : Head & Weapon & Body
+        Gender: gender,
+        equipment : Head & Weapon & Body
         */
         // static
         // characterName : character name, Job : job,
@@ -24,21 +25,24 @@ class World {
         let playerInWorld = [];
         this.remotes.forEach((otherRemote) => { // stored players that already in world to playerInWorld array
             if (otherRemote.location.map === remote.location.map) { // if in same map
+                let character = otherRemote.character;
                 playerInWorld.push({
-                    "uid": otherRemote.uid,
-                    "CharacterName": otherRemote.character.Name,
-                    "location": otherRemote.location,
-                    "HP": hp,
-                    "SP": sp,
-                    "job": job,
-                    "level": level,
-                    "Equipment": equipment
+                    "uid": otherRemote.userdata._id,
+                    "CharacterName": character.Name,
+                    "Location": character.Location,
+                    "HP": character.Status.HP,
+                    "SP": character.Status.SP,
+                    "Job": character.Status.Job,
+                    "Level": character.Status.Level,
+                    "Equipment": character.Status.Equipment
                 })
             }
         })
-        remote.send(packet.make_multiplayer_in_world(playerInWorld)); // send playerInWorld to the client who just enter
+        remote.send(packet.make_multiplayer_in_same_map(playerInWorld)); // send playerInWorld to the client who just enter
         this.remotes.push(remote) // add this client to retmoes
-        this.broadcastExcept(remote, packet.make_multiplayer_connect(remote.uid, remote.name, remote.position, remote.color));
+        // may delete (not check same map)
+        monitor.log(JSON.stringify(remote.character));
+        this.broadcastExcept(remote, packet.make_multiplayer_connect(remote.userdata._id, remote.character));
     }
 
     removeRemote(remote) {
