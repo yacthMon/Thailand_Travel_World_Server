@@ -246,13 +246,20 @@ packet.make_character_create_failed = function(){
   return o.buffer;
 }
 
-packet.make_multiplayer_connect = function (uid, name, position, color) {
+packet.make_multiplayer_connect = function (uid, character) {
   let o = new packet_writer(packet.SC_ONLINE_PLAYER_CONNECT);
+  // get data from pure Character
   o.append_uint32(uid);
-  o.append_string(name);
-  o.append_float(position.x);
-  o.append_float(position.y);
-  o.append_uint16(color);  //------------
+  o.append_string(character.Name);
+  o.append_float(character.Location.X);
+  o.append_float(character.Location.Y);
+  o.append_uint32(character.Status.HP);
+  o.append_uint32(character.Status.SP);
+  o.append_string(character.Status.Job);
+  o.append_uint32(character.Status.Level);
+  o.append_uint32(character.Status.Equipment.Head);
+  o.append_uint32(character.Status.Equipment.Body);
+  o.append_uint32(character.Status.Equipment.Weapon);
   o.finish();
   return o.buffer;
 }
@@ -273,15 +280,22 @@ packet.make_multiplayer_control = function (datas) {
   return o.buffer;
 }
 
-packet.make_multiplayer_in_world = function (players) {
+packet.make_multiplayer_in_same_map = function (players) {
   let o = new packet_writer(packet.SC_MULTIPLAYER_PLAYERS_IN_WORLD);
+  //get data from temp
   o.append_uint16(players.length);
   for (let i = 0; i < players.length; i++) {
     o.append_uint32(players[i].uid);
-    o.append_string(players[i].name);
-    o.append_float(players[i].position.x);
-    o.append_float(players[i].position.y);
-    o.append_uint16(players[i].color);
+    o.append_string(players[i].CharacterName);
+    o.append_float(players[i].Location.X);
+    o.append_float(players[i].Location.Y);
+    o.append_uint32(players[i].HP);
+    o.append_uint32(players[i].SP);
+    o.append_string(players[i].Job);
+    o.append_uint32(players[i].Level);
+    o.append_uint32(players[i].Equipment.Head);
+    o.append_uint32(players[i].Equipment.Body);
+    o.append_uint32(players[i].Equipment.Weapon);
   }
   o.finish();
   return o.buffer;
