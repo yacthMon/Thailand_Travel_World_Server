@@ -2,13 +2,13 @@
 let Monitor = require("./monitor");
 let monitor = new Monitor();
 exports.monitor = monitor;
-/*
+
 let World = require('./models/world')
 let world = new World()
 world.responseTime = 100;
 world.startQueueResponse();
 exports.world = world;
-// */
+
 let server = require('dgt-net').server;
 let packet;// = require('./network/packet');
 let remoteProxy;// = require('./network/remoteproxy');
@@ -25,7 +25,7 @@ let indexRunning = 0;
 let status = setInterval(function () {
   indexRunning = ++indexRunning == 4 ? 0 : indexRunning;
   monitor.status("[" + runningCheck[indexRunning] + "] [ Thailand Travel World Server ] {red-fg}::{/red-fg} " + remoteProxy.countClient() +
-    " Clients {red-fg}::{/red-fg} " + 0 + "  Player In world");
+    " Clients {red-fg}::{/red-fg} " + world.countPlayer() + "  Player In world");
 }, 100);
 
 monitor.info("========================================");
