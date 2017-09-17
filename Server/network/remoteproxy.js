@@ -17,7 +17,8 @@ class RemoteProxy extends server.RemoteProxy {
   initProperties() {
     this.accountKey = "";
     this.userdata = undefined;
-    this.location = {position:{x:0,y:0}, map:"none"};    
+    this.location = {position:{x:0,y:0}, map:"none"};
+    this.character = undefined;
   }
 
   onConnected() {
@@ -51,10 +52,6 @@ class RemoteProxy extends server.RemoteProxy {
       monitor.log("Error while registing account " + err);
       this.send(packet.make_register_failed(0, err));
     });
-    // monitor.log(username);
-    // monitor.log(password);
-    // monitor.log(email);
-    // monitor.log(gender);
   }
 
   async authentication(username, password) {
