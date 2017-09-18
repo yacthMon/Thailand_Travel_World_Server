@@ -175,9 +175,10 @@ class RemoteProxy extends server.RemoteProxy {
         Equipment: this.character.Status.Equipment
       }
       world.addRemote(this);
-      // this.send(packet.make_)
+      this.send(packet.make_multiplayer_enter_world_grant());
     } else {
       //Something wrong :( Can't find character that player choosed
+      this.send(packet.make_multiplayer_enter_world_denied());
     }
   }
 
