@@ -39,11 +39,13 @@ let packet = {
   SC_CHARACTER_CREATE_FAILED: 21018,
   /* 22xxx for Multiplayer*/
   SC_MULTIPLAYER_PLAYERS_IN_WORLD: 22020,
-  SC_ONLINE_PLAYER_CONNECT: 22021,
-  SC_ONLINE_PLAYER_CONTROL: 22022,
-  SC_ONLINE_PLAYER_DISCONNECT: 22023,
-  SC_CHAT: 22024,
-  SC_NOTIFICATION: 22025,
+  SC_MULTIPLAYER_ENTER_WORLD_GRANT: 22021,
+  SC_MULTIPLAYER_ENTER_WORLD_DENIED: 22022,
+  SC_ONLINE_PLAYER_CONNECT: 22023,
+  SC_ONLINE_PLAYER_CONTROL: 22024,
+  SC_ONLINE_PLAYER_DISCONNECT: 22025,
+  SC_CHAT: 22026,
+  SC_NOTIFICATION: 22027,
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -242,6 +244,18 @@ packet.make_character_create_success = function(character){
 
 packet.make_character_create_failed = function(){
   let o =new packet_writer(packet.SC_CHARACTER_CREATE_FAILED);
+  o.finish();
+  return o.buffer;
+}
+
+packet.make_multiplayer_enter_world_grant = function(){
+  let o =new packet_writer(packet.SC_MULTIPLAYER_ENTER_WORLD_GRANT);
+  o.finish();
+  return o.buffer;
+}
+
+packet.make_multiplayer_enter_world_denied = function(){
+  let o =new packet_writer(packet.SC_MULTIPLAYER_ENTER_WORLD_DENIED);
   o.finish();
   return o.buffer;
 }
