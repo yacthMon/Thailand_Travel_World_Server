@@ -166,6 +166,7 @@ class RemoteProxy extends server.RemoteProxy {
         position: { x: this.character.Location.X, y: this.character.Location.Y },
         map: this.character.Location.Map
       };
+
       this.responseData = {
         uid: this.userdata._id,
         location: this.location,
@@ -183,11 +184,16 @@ class RemoteProxy extends server.RemoteProxy {
   }
 
   playerExitWorld() {
-    // monitor.log("UID : "+this.uid+" has exit from world");
-    // world.removeRemote(this);
+    monitor.log("UID : "+this.userdata._id+" has exit from world");
+    world.removeRemote(this);
   }
-  playerControl(movement) {
-    // world.broadcast(packet.make_playercontrol(movement))
+
+  submitPlayerData(data) {
+    //console.log("RemoteProxy send player data");
+    
+    this.location.position = data.position;
+    data.map = this.location.map;
+    world.addPlayerDataToQueue(data);
   }
 
   chat(msg) {
@@ -200,11 +206,7 @@ class RemoteProxy extends server.RemoteProxy {
     // world.broadcast(packet.make_notification(notic))
   }
 
-  submitPlayerData(data) {
-    //console.log("RemoteProxy send player data");
-    this.position = data.position;
-    // world.addPlayerDataToQueue(data);
-  }
+
 }
 function countClient() {
   return clientCount;
