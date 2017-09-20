@@ -15,7 +15,7 @@ let packet = {
   CS_CREATE_CHARACTER: 11014,
   /* 12xxx for Multiplayer*/
   CS_REQUEST_ENTER_WORLD: 12020,
-  CS_PLAYER_MOVING: 12021,
+  CS_SEND_PLAYER_MOVING: 12021,
   CS_EXIT_WORLD: 12022,
   CS_CHAT: 12023,
   CS_NOTIFICATION: 12024,
@@ -100,7 +100,7 @@ packet[packet.CS_CREATE_CHARACTER] = function(remoteProxy,data){
   remoteProxy.createCharacter(name,gender,job);
 }
 
-packet[packet.CS_PLAYER_MOVING] = function (remoteProxy, data) {
+packet[packet.CS_SEND_PLAYER_MOVING] = function (remoteProxy, data) {
   let dataSet = {
     uid: data.read_uint32(),
     position: { x: data.read_float(), y: data.read_float() },
@@ -114,7 +114,7 @@ packet[packet.CS_PLAYER_MOVING] = function (remoteProxy, data) {
   // console.log("y :" + dataSet.Position.y);
   // console.log("Speed x :" + dataSet.Velocity.x);
   // console.log("Speed y :" + dataSet.Velocity.y);
-  //remoteProxy.float(f);
+  // remoteProxy.float(f);
   remoteProxy.submitPlayerData(dataSet);
 }
 
@@ -209,7 +209,7 @@ packet.make_authentication_denied = (errCode, msg) => {
 
 packet.make_account_data = (data) => {
   let o = new packet_writer(packet.SC_ACCOUN_DATA);
-  o.append_int16(data._id); // accountID  
+  o.append_int32(data._id); // accountID  
   if (data.Characters) {
     o.append_int8(data.Characters.length); // Length of Character
     for (let i = 0; i < data.Characters.length; i++) { // Append data for each character      
