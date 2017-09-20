@@ -41,7 +41,7 @@ class World {
         remote.send(packet.make_multiplayer_in_same_map(playerInWorld)); // send playerInWorld to the client who just enter
         this.remotes.push(remote) // add this client to retmoes
         // may delete (not check same map)
-        monitor.log(JSON.stringify(remote.character));
+        // monitor.log(JSON.stringify(remote.character));
         this.broadcastExcept(remote, packet.make_multiplayer_connect(remote.userdata._id, remote.character));
     }
 
@@ -49,7 +49,7 @@ class World {
         var indexOfRemote = this.remotes.indexOf(remote);
         if (indexOfRemote > -1) {
             this.remotes.splice(indexOfRemote, 1);
-            this.broadcast(packet.make_multiplayer_disconnect(remote.uid));
+            this.broadcast(packet.make_multiplayer_disconnect(remote.userdata._id));
         }
     }
 
@@ -96,7 +96,7 @@ class World {
                         //     tempDatas.push(data); // Add data that in distance to tempData;
                         // } else {//not in distance
                         // }
-                        if (otherPlayerData.location.map === remote.location.map) { // if otherPlayer in same map
+                        if (otherPlayerData.map === remote.location.map) { // if otherPlayer in same map
                             dataToSend.push(otherPlayerData);
                         }
                     });
