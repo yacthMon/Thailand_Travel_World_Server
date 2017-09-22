@@ -27,13 +27,15 @@ let status = setInterval(function () {
   monitor.status("[" + runningCheck[indexRunning] + "] [ Thailand Travel World Server ] {red-fg}::{/red-fg} " + remoteProxy.countClient() +
     " Clients {red-fg}::{/red-fg} " + world.countPlayer() + "  Player In world");
 }, 100);
-
+process.title = "Thailand Travel World Server";
 monitor.info("========================================");
 monitor.info("|| King Mongkut University of Technology Thonburi");
 monitor.info("|| Thailand Travel World server  ");
-monitor.info("|| Server Side v" + package.version);
+monitor.info("|| Server Side         : v" + package.version);
+monitor.info("|| NodeJS version      : " + process.version);
 monitor.info("|| Server port         : " + port);
 monitor.info("|| Database Server     : " + config.Database.ip);
+monitor.info("|| Log path            : " + monitor.logPath);
 monitor.info("========================================");
 db = new mongoDB(config.Database,(err) => {  
   if (!err) {
@@ -59,25 +61,4 @@ remoteProxy = require('./network/remoteproxy');
 server.setRemoteProxyClass(remoteProxy.RemoteProxy);
 server.setPacketObject(packet);
 server.listen(port);
-
-monitor.log("             .,-:;//;:=,");
-monitor.log("         . :H@@@MM@M#H/.,+%;,");
-monitor.log("      ,/X+ +M@@M@MM%=,-%HMMM@X/,");
-monitor.log("     -+@MM; $M@@MH+-,;XMMMM@MMMM@+-");
-monitor.log("    ;@M@@M- XM@X;. -+XXXXXHHH@M@M#@/.");
-monitor.log("  ,%MM@@MH ,@%=            .---=-=:=,.");
-monitor.log("  -@#@@@MX .,              -%HX$$%%%+;");
-monitor.log(" =-./@M@M$                  .;@MMMM@MM:");
-monitor.log(" X@/ -$MM/                    .+MM@@@M$");
-monitor.log(",@M@H: :@:                    . -X#@@@@-");
-monitor.log(",@@@MMX, .                    /H- ;@M@M=");
-monitor.log(".H@@@@M@+,                    %MM+..%#$.");
-monitor.log(" /MMMM@MMH/.                  XM@MH; -;");
-monitor.log("  /%+%$XHH@$=              , .H@@@@MX,");
-monitor.log("   .=--------.           -%H.,@@@@@MX,");
-monitor.log("   .%MM@@@HHHXX$$$%+- .:$MMX -M@@MM%.");
-monitor.log("     =XMMM@MM@MM#H;,-+HMM@M+ /MMMX=");
-monitor.log("       =%@M@M#@$-.=$@MM@@@M; %M%=");
-monitor.log("         ,:+$+-,/H#MMMMMMM@- -,");
-monitor.log("               =++%%%%+/:-.");
 
