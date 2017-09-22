@@ -1,6 +1,6 @@
 {
   "name": "thailand_travel_wrold_server",
-  "version": "0.2.1",
+  "version": "0.2.5",
   "description": "Thailand Travel World main server.",
   "main": "server.js",
   "dependencies": {
