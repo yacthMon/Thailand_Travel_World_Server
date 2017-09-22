@@ -1,5 +1,16 @@
 let packet_writer = require('dgt-net').packet_writer
 
+let animationId = {
+  IDLE: 1,
+  WALK: 2,
+  HURT: 3,
+  ATTACK: 4,
+  JUMP: 5,
+  FALL: 6,
+  DIE: 7,
+  DIE_LOOP: 8
+}
+
 let packet = {
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -105,16 +116,10 @@ packet[packet.CS_SEND_PLAYER_MOVING] = function (remoteProxy, data) {
     uid: data.read_uint32(),
     position: { x: data.read_float(), y: data.read_float() },
     velocity: { x: data.read_float(), y: data.read_float() },
-    scaleX: data.read_float()
+    scaleX: data.read_float(),
+    animation: data.read_uint8()
   }
   if (!data.completed()) return true;
-  // console.log("Player moving");
-  // console.log("UID : "+dataSet.UID);
-  // console.log("x : "+dataSet.Position.x);
-  // console.log("y :" + dataSet.Position.y);
-  // console.log("Speed x :" + dataSet.Velocity.x);
-  // console.log("Speed y :" + dataSet.Velocity.y);
-  // remoteProxy.float(f);
   remoteProxy.submitPlayerData(dataSet);
 }
 
@@ -166,20 +171,6 @@ packet.make_ping_success = function () {
 
 packet.make_authentication_grant = function (uid, color, highest_level, highest_checkpoint) {
   let o = new packet_writer(packet.SC_AUTHENTICATION_GRANT);
-  /*o.append_uint32(uid);
-  o.append_uint8(color);
-  o.append_uint16(highest_level);
-  o.append_uint16(highest_checkpoint);*/
-  /*o.append_uint32(uid);
-  o.append_string(name);
-  o.append_uint16(floor);
-
-  let a = [10, 20, 50, 60];
-  o.append_uint8(a.length);
-  for (let i = 0; i < a.length; i++) {
-    o.append_uint16(a[i]);
-  }
-  */
   o.finish();
   return o.buffer;
 }
@@ -283,12 +274,14 @@ packet.make_multiplayer_control = function (datas) {
   o.append_uint16(datas.length); //add length first to tell client before loop
   for (let i = 0; i < datas.length; i++) {
     // UID, Name, HP,SP,Job,Level,Equipment,Position only
+    //current : uid, position, velocity, scaleX , animation
     o.append_uint32(datas[i].uid);
     o.append_float(datas[i].position.x);
     o.append_float(datas[i].position.y);
     o.append_float(datas[i].velocity.x);
     o.append_float(datas[i].velocity.y);
     o.append_float(datas[i].scaleX);
+    o.append_int8(datas[i].animation);
   }
   o.finish();
   return o.buffer;
