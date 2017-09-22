@@ -20,6 +20,7 @@ class RemoteProxy extends server.RemoteProxy {
     this.location = undefined;//{ position: { x: 0, y: 0 }, map: "none" };
     this.character = undefined;// Character that was choose by player
     this.responseData = undefined;// response data for send to other player
+    this.inWorld = false;
     /* Response data 
             uid : user id,        
             location : position(x,y) & currentMap,
@@ -39,6 +40,9 @@ class RemoteProxy extends server.RemoteProxy {
   }
 
   onDisconnected() {
+    if(this.inWorld){
+      world.removeRemote(this);
+    }
     monitor.log("[RemoteProxy] Disconnected from " + this.getPeerName())
     clientCount--;
   }
@@ -175,6 +179,7 @@ class RemoteProxy extends server.RemoteProxy {
         Level: this.character.Status.Level,
         Equipment: this.character.Status.Equipment
       }
+      this.inWorld = true;
       world.addRemote(this);
       this.send(packet.make_multiplayer_enter_world_grant());
     } else {
@@ -185,12 +190,13 @@ class RemoteProxy extends server.RemoteProxy {
 
   playerExitWorld() {
     monitor.log("UID : "+this.userdata._id+" has exit from world");
+    this.inWorld = false;
     world.removeRemote(this);
   }
 
   submitPlayerData(data) {
     //console.log("RemoteProxy send player data");
-    
+
     this.location.position = data.position;
     data.map = this.location.map;
     world.addPlayerDataToQueue(data);
