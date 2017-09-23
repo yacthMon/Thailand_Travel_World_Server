@@ -16,8 +16,7 @@ class RemoteProxy extends server.RemoteProxy {
 
   initProperties() {
     this.accountKey = "";
-    this.userdata = undefined;
-    this.location = undefined;//{ position: { x: 0, y: 0 }, map: "none" };
+    this.userdata = undefined;    
     this.character = undefined;// Character that was choose by player
     this.responseData = undefined;// response data for send to other player
     this.inWorld = false;
@@ -124,9 +123,8 @@ class RemoteProxy extends server.RemoteProxy {
         }
       },
       Location: {
-        Map: "Bangkok",
-        X: 0,
-        Y: 0,
+        Position : {x:0,y:0},
+        Map: "Bangkok",        
       },
       Inventory: {
         Gold: 100,
@@ -154,8 +152,8 @@ class RemoteProxy extends server.RemoteProxy {
 
   playerEnterWorld(characterName) {
     /* Response data 
-        uid : user id,        
-        location : position(x,y) & currentMap,
+        UID : user id,        
+        Location : Position(x,y) & Map,
         HP : health point,
         SP : Stamina point,
         Level : level,
@@ -166,14 +164,9 @@ class RemoteProxy extends server.RemoteProxy {
     let characterIndex = this.userdata.Characters.findIndex((character) => { return character.Name == characterName });
     if (characterIndex > -1) {
       this.character = this.userdata.Characters[characterIndex]; // set choosed character
-      this.location = {
-        position: { x: this.character.Location.X, y: this.character.Location.Y },
-        map: this.character.Location.Map
-      };
-
       this.responseData = {
-        uid: this.userdata._id,
-        location: this.location,
+        UID: this.userdata._id,
+        Location: this.character.Location,
         HP: this.character.Status.HP,
         SP: this.character.Status.SP,
         Level: this.character.Status.Level,
@@ -188,17 +181,24 @@ class RemoteProxy extends server.RemoteProxy {
     }
   }
 
+  playerChangeMap(mapName, position){
+    world.removeRemote(this);
+    monitor.debug("ID : " + this.userdata._id + " change map form " + this.character.Location.Map + " to " + mapName );
+    this.character.Location.Map = mapName;    
+    this.character.Location.Position = position;
+    world.addRemote(this);
+  }
+
   playerExitWorld() {
     monitor.log("UID : "+this.userdata._id+" has exit from world");
     this.inWorld = false;
     world.removeRemote(this);
   }
 
-  submitPlayerData(data) {
+  submitPlayerControlData(data) {
     //console.log("RemoteProxy send player data");
-
-    this.location.position = data.position;
-    data.map = this.location.map;
+    this.character.Location.Position = data.Position;    
+    data.Map = this.character.Location.Map;    
     world.addPlayerDataToQueue(data);
   }
 

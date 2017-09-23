@@ -28,8 +28,9 @@ let packet = {
   CS_REQUEST_ENTER_WORLD: 12020,
   CS_SEND_PLAYER_MOVING: 12021,
   CS_EXIT_WORLD: 12022,
-  CS_CHAT: 12023,
-  CS_NOTIFICATION: 12024,
+  CS_PLAYER_CHANGE_MAP: 12023,
+  CS_CHAT: 12101,
+  CS_NOTIFICATION: 12102,
 
   ////////////////////////////////////////////////////////////////////////////////
   // Server to Client
@@ -113,20 +114,27 @@ packet[packet.CS_CREATE_CHARACTER] = function(remoteProxy,data){
 
 packet[packet.CS_SEND_PLAYER_MOVING] = function (remoteProxy, data) {
   let dataSet = {
-    uid: data.read_uint32(),
-    position: { x: data.read_float(), y: data.read_float() },
-    velocity: { x: data.read_float(), y: data.read_float() },
-    scaleX: data.read_float(),
-    animation: data.read_uint8()
+    UID: data.read_uint32(),
+    Position: { x: data.read_float(), y: data.read_float() },
+    Velocity: { x: data.read_float(), y: data.read_float() },
+    ScaleX: data.read_float(),
+    Animation: data.read_uint8()
   }
   if (!data.completed()) return true;
-  remoteProxy.submitPlayerData(dataSet);
+  remoteProxy.submitPlayerControlData(dataSet);
 }
 
 packet[packet.CS_REQUEST_ENTER_WORLD] = function (remoteProxy, data) {
   let characterName = data.read_string();  
   if (!data.completed()) return true;
   remoteProxy.playerEnterWorld(characterName);
+}
+
+packet[packet.CS_PLAYER_CHANGE_MAP] = function (remoteProxy, data) {
+  let mapName = data.read_string();  
+  let position = {x:data.read_float(),y:data.read_float()};
+  if (!data.completed()) return true;
+  remoteProxy.playerChangeMap(mapName,position);
 }
 
 packet[packet.CS_EXIT_WORLD] = (remoteProxy, data) => {
@@ -256,8 +264,8 @@ packet.make_multiplayer_connect = function (uid, character) {
   // get data from pure Character
   o.append_uint32(uid);
   o.append_string(character.Name);
-  o.append_float(character.Location.X);
-  o.append_float(character.Location.Y);
+  o.append_float(character.Location.Position.x);
+  o.append_float(character.Location.Position.y);
   o.append_uint32(character.Status.HP);
   o.append_uint32(character.Status.SP);
   o.append_string(character.Status.Job);
@@ -275,13 +283,13 @@ packet.make_multiplayer_control = function (datas) {
   for (let i = 0; i < datas.length; i++) {
     // UID, Name, HP,SP,Job,Level,Equipment,Position only
     //current : uid, position, velocity, scaleX , animation
-    o.append_uint32(datas[i].uid);
-    o.append_float(datas[i].position.x);
-    o.append_float(datas[i].position.y);
-    o.append_float(datas[i].velocity.x);
-    o.append_float(datas[i].velocity.y);
-    o.append_float(datas[i].scaleX);
-    o.append_int8(datas[i].animation);
+    o.append_uint32(datas[i].UID);
+    o.append_float(datas[i].Position.x);
+    o.append_float(datas[i].Position.y);
+    o.append_float(datas[i].Velocity.x);
+    o.append_float(datas[i].Velocity.y);
+    o.append_float(datas[i].ScaleX);
+    o.append_int8(datas[i].Animation);
   }
   o.finish();
   return o.buffer;
@@ -292,10 +300,10 @@ packet.make_multiplayer_in_same_map = function (players) {
   //get data from temp
   o.append_uint16(players.length);
   for (let i = 0; i < players.length; i++) {
-    o.append_uint32(players[i].uid);
+    o.append_uint32(players[i].UID);
     o.append_string(players[i].CharacterName);
-    o.append_float(players[i].Location.X);
-    o.append_float(players[i].Location.Y);
+    o.append_float(players[i].Location.Position.x);
+    o.append_float(players[i].Location.Position.y);
     o.append_uint32(players[i].HP);
     o.append_uint32(players[i].SP);
     o.append_string(players[i].Job);
@@ -353,8 +361,8 @@ function convertCharacterDataToPacketData(packet,character){
   //////////////////////////////////////////
   // Location
   packet.append_string(character.Location.Map);  // Current Map
-  packet.append_float(character.Location.X);    // X
-  packet.append_float(character.Location.Y);    // Y
+  packet.append_float(character.Location.Position.x);    // X
+  packet.append_float(character.Location.Position.y);    // Y
   //////////////////////////////////////////
   // Inventory
   packet.append_int32(character.Inventory.Gold);   // Gold
