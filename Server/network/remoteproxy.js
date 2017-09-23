@@ -16,7 +16,7 @@ class RemoteProxy extends server.RemoteProxy {
 
   initProperties() {
     this.accountKey = "";
-    this.userdata = undefined;    
+    this.userdata = undefined;
     this.character = undefined;// Character that was choose by player
     this.responseData = undefined;// response data for send to other player
     this.inWorld = false;
@@ -39,15 +39,17 @@ class RemoteProxy extends server.RemoteProxy {
   }
 
   onDisconnected() {
-    if(this.inWorld){
+    if (this.inWorld) {
       world.removeRemote(this);
+    }
+    if (this.character) {
+      this.updateCharacterData(this.character);
     }
     monitor.log("[RemoteProxy] Disconnected from " + this.getPeerName())
     clientCount--;
   }
 
   ping() {
-    // monitor.log('[RemoteProxy] ping: ' + pingTime)
     this.send(packet.make_ping_success())
   }
 
@@ -110,9 +112,10 @@ class RemoteProxy extends server.RemoteProxy {
         Job: job,
         Level: 1,
         EXP: 0,
+        MaxEXP: 150,
         HP: 100,
-        SP: 50,
         MaxHP: 100,
+        SP: 50,        
         MaxSP: 50,
         ATK: 20,
         DEF: 5,
@@ -123,8 +126,8 @@ class RemoteProxy extends server.RemoteProxy {
         }
       },
       Location: {
-        Position : {x:0,y:0},
-        Map: "Bangkok",        
+        Position: { x: 0, y: 0 },
+        Map: "Bangkok",
       },
       Inventory: {
         Gold: 100,
@@ -141,13 +144,11 @@ class RemoteProxy extends server.RemoteProxy {
     }
   }
 
-  updateAccountData(color, highest_level, highest_checkpoint) {
-    // db.setAccountData({"target":{"uid":this.uid},
-    // "data":{"color":color,"highest_level":highest_level,"highest_checkpoint":highest_checkpoint}},(result)=>{
-    //   if(result.affectedRows >0){
-    //     monitor.debug("Update account data for UID "+this.uid+" success");
-    //   }
-    // })
+  async updateCharacterData(character) {    
+    let result = await db.updateCharacterData(this.character);
+      monitor.debug("Update character \""+ character.Name + "\" of User ID : " + this.userdata._id+
+      (result? "[{green-fg}OK{/green-fg}]" : "[{red-fg}FAILED{/red-fg}]"));
+    
   }
 
   playerEnterWorld(characterName) {
@@ -181,27 +182,33 @@ class RemoteProxy extends server.RemoteProxy {
     }
   }
 
-  playerChangeMap(mapName, position){
+  playerChangeMap(mapName, position) {
     world.removeRemote(this);
-    monitor.debug("ID : " + this.userdata._id + " change map form " + this.character.Location.Map + " to " + mapName );
-    this.character.Location.Map = mapName;    
+    monitor.debug("ID : " + this.userdata._id + " change map form " + this.character.Location.Map + " to " + mapName);
+    this.character.Location.Map = mapName;
     this.character.Location.Position = position;
     world.addRemote(this);
   }
 
   playerExitWorld() {
-    monitor.log("UID : "+this.userdata._id+" has exit from world");
+    monitor.log("UID : " + this.userdata._id + " has exit from world");
     this.inWorld = false;
     world.removeRemote(this);
   }
 
   submitPlayerControlData(data) {
     //console.log("RemoteProxy send player data");
-    this.character.Location.Position = data.Position;    
-    data.Map = this.character.Location.Map;    
+    this.character.Location.Position = data.Position;
+    data.Map = this.character.Location.Map;
     world.addPlayerDataToQueue(data);
   }
 
+  updateCharacterStatus(status){    
+    status.Gender = this.character.Status.Gender;
+    status.Job = this.character.Status.Job;
+    status.Equipment = this.character.Status.Equipment;
+    this.character.Status = status;
+  }
   chat(msg) {
     console.log('RemoteProxy chat: ' + msg)
     // world.broadcast(packet.make_chat(msg))

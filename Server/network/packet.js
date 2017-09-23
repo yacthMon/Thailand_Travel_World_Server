@@ -29,6 +29,7 @@ let packet = {
   CS_SEND_PLAYER_MOVING: 12021,
   CS_EXIT_WORLD: 12022,
   CS_PLAYER_CHANGE_MAP: 12023,
+  CS_SEND_PLAYER_STATUS: 12024,
   CS_CHAT: 12101,
   CS_NOTIFICATION: 12102,
 
@@ -120,6 +121,7 @@ packet[packet.CS_SEND_PLAYER_MOVING] = function (remoteProxy, data) {
     ScaleX: data.read_float(),
     Animation: data.read_uint8()
   }
+  let characterData = {};
   if (!data.completed()) return true;
   remoteProxy.submitPlayerControlData(dataSet);
 }
@@ -135,6 +137,22 @@ packet[packet.CS_PLAYER_CHANGE_MAP] = function (remoteProxy, data) {
   let position = {x:data.read_float(),y:data.read_float()};
   if (!data.completed()) return true;
   remoteProxy.playerChangeMap(mapName,position);
+}
+
+packet[packet.CS_SEND_PLAYER_STATUS] = function (remoteProxy, data) {
+  let status = {
+    Level: data.read_uint8(),
+    EXP : data.read_uint16(),
+    MaxEXP: data.read_uint16(),
+    HP: data.read_uint16(),
+    MaxHP: data.read_uint16(),
+    SP: data.read_uint16(),
+    MaxSP: data.read_uint16(),
+    ATK: data.read_uint16(),
+    DEF: data.read_uint16()
+  }
+  if (!data.completed()) return true;
+  remoteProxy.updateCharacterStatus(status);
 }
 
 packet[packet.CS_EXIT_WORLD] = (remoteProxy, data) => {

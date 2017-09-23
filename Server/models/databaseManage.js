@@ -108,8 +108,7 @@ class mongoDB {
             this.db.collection("TTW").findOne({ Username: username }, (err, user) => {
                 if (err) { reject(err); return; }
                 if (user) {
-                    //found user
-                    // console.log(user);
+                    //found user                    
                     if (password === user.Password) {
                         // resolve(true); // Access Grant
                         resolve(user)//Access grant
@@ -139,6 +138,16 @@ class mongoDB {
                 if(err) {reject(err); return;}
                 resolve(data.result.n > 0 ? characterData : false );
             })
+        })
+    }
+
+    async updateCharacterData(characterData){
+        return new Promise((resolve,reject)=>{
+            this.db.collection("TTW").update({"Characters.Name":characterData.Name},
+            {$set: {"Characters.$":characterData}}, (err,data)=>{
+                if(err) {reject(err); return;}
+                resolve(data.result.n > 0 ? true : false );
+            });
         })
     }
 
