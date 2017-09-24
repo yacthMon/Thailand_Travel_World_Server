@@ -367,6 +367,7 @@ function convertCharacterDataToPacketData(packet,character){
   packet.append_int32(character.Status.EXP);   // EXP
   packet.append_int32(character.Status.HP);    // HP
   packet.append_int32(character.Status.SP);    // SP
+  packet.append_int32(character.Status.MaxEXP);// Max EXP
   packet.append_int32(character.Status.MaxHP); // Max HP
   packet.append_int32(character.Status.MaxSP); // Max SP
   packet.append_int32(character.Status.ATK);   // ATK
