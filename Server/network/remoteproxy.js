@@ -137,6 +137,7 @@ class RemoteProxy extends server.RemoteProxy {
     let result = await db.createCharacter(this.userdata._id, data);
     if (result) {
       monitor.debug("Characterd created");
+      this.userdata.Characters.push(data);
       this.send(packet.make_character_create_success(result));
     } else {
       monitor.debug("Failed to create character");
@@ -162,6 +163,7 @@ class RemoteProxy extends server.RemoteProxy {
         */
     // static
     // characterName : character name, Job : job,
+    monitor.debug("Character enter world \"" + characterName + "\"");
     let characterIndex = this.userdata.Characters.findIndex((character) => { return character.Name == characterName });
     if (characterIndex > -1) {
       this.character = this.userdata.Characters[characterIndex]; // set choosed character
