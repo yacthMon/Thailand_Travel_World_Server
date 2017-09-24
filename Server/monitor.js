@@ -64,26 +64,31 @@ class Monitor {
 
     this.screen.key(['C-a'], (ch, key) => {
       // making error      
-      logPath.ASD();
+      logPath.ASD();      
+    });
+    this.screen.key(['C-x'], (ch, key) => {
+      // making error            
+      console.error("5555 damnit ", 55552);
     });
 
     //== Log ===========================================
-    this.logNormal = fs.createWriteStream(this.logPath + "logs.txt", { flags: 'a' })
-    this.logError = fs.createWriteStream(this.logPath + "errors.txt", { flags: 'a' })
+    this.logNormal = fs.createWriteStream(this.logPath + "logs.txt", { flags: 'a' });
+    this.logError = fs.createWriteStream(this.logPath + "errors.txt", { flags: 'a' });
     this.logErrorCount = 0;
     let startServerText = "\r\nServer start : " + this.fullCurrentTime() + "\r\n";
     let shurdownServerText = "Server Shutingdown on " + this.fullCurrentTime();
 
     this.logNormal.write(startServerText);
     this.logError.write(startServerText);
-
-    process.on('uncaughtException', (err) => {
+    this.error = (err,code) => {
       let errorCount = this.logErrorCount++;
       this.logError.write(this.fullCurrentTime() + " [" + errorCount + "]\r\n");
       this.logError.write((((err && err.stack) ? err.stack : err)));
       this.logError.write("\r\n");
-      this.log("{red-fg}[uncaughtException]{/red-fg} update in errors log " + this.fullCurrentTime() + ", error number : [" + errorCount + "]");
-    });
+      this.log("{red-fg}[" + (code?"Error "+code:"uncaughtException" )+"]{/red-fg} update in errors log " + this.fullCurrentTime() + ", error number : [" + errorCount + "]");
+    }
+    console.error = this.error;
+    process.on('uncaughtException', this.error);
 
     process.on('exit', (code) => {
       this.logNormal.write(shurdownServerText + " with code : " + code);
@@ -126,7 +131,6 @@ class Monitor {
     this.logNormal.write(logText + "\r\n");
     this.screen.render();
   }
-
   currentTime() {
     let time = new Date();
     return ((time.getHours() < 10) ? "0" : "") + time.getHours() + ":" + ((time.getMinutes() < 10) ? "0" : "") + time.getMinutes() + ":" + ((time.getSeconds() < 10) ? "0" : "") + time.getSeconds();
