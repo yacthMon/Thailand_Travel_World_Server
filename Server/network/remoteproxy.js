@@ -20,6 +20,9 @@ class RemoteProxy extends server.RemoteProxy {
     this.character = undefined;// Character that was choose by player
     this.responseData = undefined;// response data for send to other player
     this.inWorld = false;
+    //=== Facebook
+    this.facebookId = undefined;
+    this.facebookToken = undefined;
     /* Response data 
             uid : user id,        
             location : position(x,y) & currentMap,
@@ -93,6 +96,48 @@ class RemoteProxy extends server.RemoteProxy {
       monitor.log("Error : No DB :(");
   }
 
+  async authenticationWithFacebook(fbid, token) {
+    monitor.debug('Client [' + this.getPeerName() + ']  request authentication with facebook')
+    this.facebookId = fbid;
+    this.facebookToken = token;
+    if (db) {
+      let loginResult = await db.doLoginWithFacebook(fbid, token);
+      if (loginResult) {
+        if (typeof (loginResult) === "number") {
+          monitor.debug('Client access denied [try to with facebook \'' + fbid + '\']');
+          this.send(packet.make_authentication_denied(loginResult, error[loginResult]));
+        } else {
+          monitor.debug('Client access grant [ login as facebook : \'' + fbid + '\']');
+          // monitor.log(JSON.stringify(loginResult));
+          this.userdata = loginResult;
+          this.send(packet.make_authentication_grant());
+          this.send(packet.make_account_data(loginResult));
+        }
+      } else {
+        monitor.debug('Client access denied [try to login as not exist facebook account \'' + fbid + '\']');
+        this.send(packet.make_facebook_request_register());
+      }
+    } else
+      monitor.log("Error : No DB :(");
+  }
+
+  async registerFacebookData(email, gender) {
+    db.addFacebookAccount(this.facebookId, this.facebookToken,email, gender).then((err, res) => {
+      if (err) {
+        monitor.log("Register with Facebook failed : " + err);
+        this.send(packet.make_register_failed(err, error[err]));
+        return;
+      } else {
+        monitor.log("Registing with Facebook success for email ['" + email + "']")
+        this.authenticationWithFacebook(this.facebookId, this.facebookToken);
+        return;
+      }
+    }, (err) => {
+      monitor.log("Error while registing account " + err);
+      this.send(packet.make_register_failed(0, err));
+    });
+  }
+
   async checkCharacterName(characterName) {
     if (!await db.isCharacterNameExist(characterName)) {
       monitor.debug("Name '" + characterName + "' is available ");
@@ -115,7 +160,7 @@ class RemoteProxy extends server.RemoteProxy {
         MaxEXP: 150,
         HP: 100,
         MaxHP: 100,
-        SP: 50,        
+        SP: 50,
         MaxSP: 50,
         ATK: 20,
         DEF: 5,
@@ -145,11 +190,11 @@ class RemoteProxy extends server.RemoteProxy {
     }
   }
 
-  async updateCharacterData(character) {    
+  async updateCharacterData(character) {
     let result = await db.updateCharacterData(this.character);
-      monitor.debug("Update character \""+ character.Name + "\" of User ID : " + this.userdata._id+
-      (result? "[{green-fg}OK{/green-fg}]" : "[{red-fg}FAILED{/red-fg}]"));
-    
+    monitor.debug("Update character \"" + character.Name + "\" of User ID : " + this.userdata._id +
+      (result ? "[{green-fg}OK{/green-fg}]" : "[{red-fg}FAILED{/red-fg}]"));
+
   }
 
   playerEnterWorld(characterName) {
@@ -205,7 +250,7 @@ class RemoteProxy extends server.RemoteProxy {
     world.addPlayerDataToQueue(data);
   }
 
-  updateCharacterStatus(status){    
+  updateCharacterStatus(status) {
     status.Gender = this.character.Status.Gender;
     status.Job = this.character.Status.Job;
     status.Equipment = this.character.Status.Equipment;

@@ -24,6 +24,8 @@ let packet = {
   CS_UPDATE_ACCOUNTDATA: 11012,
   CS_CHECK_CHARACTER_NAME: 11013,
   CS_CREATE_CHARACTER: 11014,
+  CS_AUTHENTICATION_WITH_FACEBOOK: 11015,
+  CS_REGISTER_FACEBOOK_DATA: 11016,
   /* 12xxx for Multiplayer*/
   CS_REQUEST_ENTER_WORLD: 12020,
   CS_SEND_PLAYER_MOVING: 12021,
@@ -50,6 +52,7 @@ let packet = {
   SC_CHARACTER_NAME_ALREADY_USED: 21016,
   SC_CHARACTER_CREATE_SUCCESS: 21017,
   SC_CHARACTER_CREATE_FAILED: 21018,
+  SC_FACEBOOK_REQUEST_REGISTER: 21019,
   /* 22xxx for Multiplayer*/
   SC_MULTIPLAYER_PLAYERS_IN_WORLD: 22020,
   SC_MULTIPLAYER_ENTER_WORLD_GRANT: 22021,
@@ -111,6 +114,20 @@ packet[packet.CS_CREATE_CHARACTER] = function(remoteProxy,data){
   let job = data.read_string();
   if(!data.completed()) return true;
   remoteProxy.createCharacter(name,gender,job);
+}
+
+packet[packet.CS_AUTHENTICATION_WITH_FACEBOOK] = function (remoteProxy, data) {
+  let fbid = data.read_string();
+  let token = data.read_string();
+  if (!data.completed()) return true;
+  remoteProxy.authenticationWithFacebook(fbid,token);
+}
+
+packet[packet.CS_REGISTER_FACEBOOK_DATA] = function(remoteProxy,data){
+  let email = data.read_string();
+  let gender = data.read_string();
+  if(!data.completed()) return true;
+  remoteProxy.registerFacebookData(email,gender);
 }
 
 packet[packet.CS_SEND_PLAYER_MOVING] = function (remoteProxy, data) {
@@ -224,6 +241,12 @@ packet.make_authentication_denied = (errCode, msg) => {
   return o.buffer;
 }
 
+packet.make_facebook_request_register = (errCode, msg) => {
+  let o = new packet_writer(packet.SC_FACEBOOK_REQUEST_REGISTER);
+  o.finish()
+  return o.buffer;
+}
+
 packet.make_account_data = (data) => {
   let o = new packet_writer(packet.SC_ACCOUN_DATA);
   o.append_int32(data._id); // accountID  
@@ -308,8 +331,8 @@ packet.make_multiplayer_control = function (datas) {
     o.append_float(datas[i].Velocity.y);
     o.append_float(datas[i].ScaleX);
     o.append_int8(datas[i].Animation);
-  }
-  o.finish();
+  } 
+  o.finish(); //[Bug(5)]ทำงานก่อนที่ for จะเสร็จ ??
   return o.buffer;
 }
 
