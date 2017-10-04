@@ -1,5 +1,16 @@
 let packet_writer = require('dgt-net').packet_writer
 
+let animationId = {
+  IDLE: 1,
+  WALK: 2,
+  HURT: 3,
+  ATTACK: 4,
+  JUMP: 5,
+  FALL: 6,
+  DIE: 7,
+  DIE_LOOP: 8
+}
+
 let packet = {
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -13,12 +24,16 @@ let packet = {
   CS_UPDATE_ACCOUNTDATA: 11012,
   CS_CHECK_CHARACTER_NAME: 11013,
   CS_CREATE_CHARACTER: 11014,
+  CS_AUTHENTICATION_WITH_FACEBOOK: 11015,
+  CS_REGISTER_FACEBOOK_DATA: 11016,
   /* 12xxx for Multiplayer*/
-  CS_ENTER_WORLD: 12020,
-  CS_PLAYER_MOVING: 12021,
+  CS_REQUEST_ENTER_WORLD: 12020,
+  CS_SEND_PLAYER_MOVING: 12021,
   CS_EXIT_WORLD: 12022,
-  CS_CHAT: 12023,
-  CS_NOTIFICATION: 12024,
+  CS_PLAYER_CHANGE_MAP: 12023,
+  CS_SEND_PLAYER_STATUS: 12024,
+  CS_CHAT: 12101,
+  CS_NOTIFICATION: 12102,
 
   ////////////////////////////////////////////////////////////////////////////////
   // Server to Client
@@ -37,13 +52,16 @@ let packet = {
   SC_CHARACTER_NAME_ALREADY_USED: 21016,
   SC_CHARACTER_CREATE_SUCCESS: 21017,
   SC_CHARACTER_CREATE_FAILED: 21018,
+  SC_FACEBOOK_REQUEST_REGISTER: 21019,
   /* 22xxx for Multiplayer*/
   SC_MULTIPLAYER_PLAYERS_IN_WORLD: 22020,
-  SC_MULTIPLAYER_CONNECT: 22021,
-  SC_MULTIPLAYER_CONTROL: 22022,
-  SC_MULTIPLAYER_DISCONNET: 22023,
-  SC_CHAT: 22024,
-  SC_NOTIFICATION: 22025,
+  SC_MULTIPLAYER_ENTER_WORLD_GRANT: 22021,
+  SC_MULTIPLAYER_ENTER_WORLD_DENIED: 22022,
+  SC_ONLINE_PLAYER_CONNECT: 22023,
+  SC_ONLINE_PLAYER_CONTROL: 22024,
+  SC_ONLINE_PLAYER_DISCONNECT: 22025,
+  SC_CHAT: 22026,
+  SC_NOTIFICATION: 22027,
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,29 +116,60 @@ packet[packet.CS_CREATE_CHARACTER] = function(remoteProxy,data){
   remoteProxy.createCharacter(name,gender,job);
 }
 
-packet[packet.CS_PLAYER_MOVING] = function (remoteProxy, data) {
-  let dataSet = {
-    uid: data.read_uint32(),
-    position: { x: data.read_float(), y: data.read_float() },
-    velocity: { x: data.read_float(), y: data.read_float() },
-    scaleX: data.read_float()
-  }
+packet[packet.CS_AUTHENTICATION_WITH_FACEBOOK] = function (remoteProxy, data) {
+  let fbid = data.read_string();
+  let token = data.read_string();
   if (!data.completed()) return true;
-  // console.log("Player moving");
-  // console.log("UID : "+dataSet.UID);
-  // console.log("x : "+dataSet.Position.x);
-  // console.log("y :" + dataSet.Position.y);
-  // console.log("Speed x :" + dataSet.Velocity.x);
-  // console.log("Speed y :" + dataSet.Velocity.y);
-  //remoteProxy.float(f);
-  remoteProxy.submitPlayerData(dataSet);
+  remoteProxy.authenticationWithFacebook(fbid,token);
+}
+
+packet[packet.CS_REGISTER_FACEBOOK_DATA] = function(remoteProxy,data){
+  let email = data.read_string();
+  let gender = data.read_string();
+  if(!data.completed()) return true;
+  remoteProxy.registerFacebookData(email,gender);
+}
+
+packet[packet.CS_SEND_PLAYER_MOVING] = function (remoteProxy, data) {
+  let dataSet = {
+    UID: data.read_uint32(),
+    Position: { x: data.read_float(), y: data.read_float() },
+    Velocity: { x: data.read_float(), y: data.read_float() },
+    ScaleX: data.read_float(),
+    Animation: data.read_uint8()
+  }
+  let characterData = {};
+  if (!data.completed()) return true;
+  remoteProxy.submitPlayerControlData(dataSet);
 }
 
 packet[packet.CS_REQUEST_ENTER_WORLD] = function (remoteProxy, data) {
-  let position = { x: data.read_float(), y: data.read_float() }
-  let color = data.read_uint16()
+  let characterName = data.read_string();  
   if (!data.completed()) return true;
-  remoteProxy.playerEnterWorld(position, color);
+  remoteProxy.playerEnterWorld(characterName);
+}
+
+packet[packet.CS_PLAYER_CHANGE_MAP] = function (remoteProxy, data) {
+  let mapName = data.read_string();  
+  let position = {x:data.read_float(),y:data.read_float()};
+  if (!data.completed()) return true;
+  remoteProxy.playerChangeMap(mapName,position);
+}
+
+packet[packet.CS_SEND_PLAYER_STATUS] = function (remoteProxy, data) {
+  let status = {
+    Level: data.read_uint8(),
+    EXP : data.read_uint16(),
+    MaxEXP: data.read_uint16(),
+    HP: data.read_uint16(),
+    MaxHP: data.read_uint16(),
+    SP: data.read_uint16(),
+    MaxSP: data.read_uint16(),
+    ATK: data.read_uint16(),
+    DEF: data.read_uint16()
+  }
+  if (!data.completed()) return true;
+  remoteProxy.updateCharacterStatus(status);
 }
 
 packet[packet.CS_EXIT_WORLD] = (remoteProxy, data) => {
@@ -165,20 +214,6 @@ packet.make_ping_success = function () {
 
 packet.make_authentication_grant = function (uid, color, highest_level, highest_checkpoint) {
   let o = new packet_writer(packet.SC_AUTHENTICATION_GRANT);
-  /*o.append_uint32(uid);
-  o.append_uint8(color);
-  o.append_uint16(highest_level);
-  o.append_uint16(highest_checkpoint);*/
-  /*o.append_uint32(uid);
-  o.append_string(name);
-  o.append_uint16(floor);
-
-  let a = [10, 20, 50, 60];
-  o.append_uint8(a.length);
-  for (let i = 0; i < a.length; i++) {
-    o.append_uint16(a[i]);
-  }
-  */
   o.finish();
   return o.buffer;
 }
@@ -206,9 +241,15 @@ packet.make_authentication_denied = (errCode, msg) => {
   return o.buffer;
 }
 
+packet.make_facebook_request_register = (errCode, msg) => {
+  let o = new packet_writer(packet.SC_FACEBOOK_REQUEST_REGISTER);
+  o.finish()
+  return o.buffer;
+}
+
 packet.make_account_data = (data) => {
   let o = new packet_writer(packet.SC_ACCOUN_DATA);
-  o.append_int16(data._id); // accountID  
+  o.append_int32(data._id); // accountID  
   if (data.Characters) {
     o.append_int8(data.Characters.length); // Length of Character
     for (let i = 0; i < data.Characters.length; i++) { // Append data for each character      
@@ -247,48 +288,77 @@ packet.make_character_create_failed = function(){
   return o.buffer;
 }
 
-packet.make_multiplayer_connect = function (uid, name, position, color) {
-  let o = new packet_writer(packet.SC_MULTIPLAYER_CONNECT);
+packet.make_multiplayer_enter_world_grant = function(){
+  let o =new packet_writer(packet.SC_MULTIPLAYER_ENTER_WORLD_GRANT);
+  o.finish();
+  return o.buffer;
+}
+
+packet.make_multiplayer_enter_world_denied = function(){
+  let o =new packet_writer(packet.SC_MULTIPLAYER_ENTER_WORLD_DENIED);
+  o.finish();
+  return o.buffer;
+}
+
+packet.make_multiplayer_connect = function (uid, character) {
+  let o = new packet_writer(packet.SC_ONLINE_PLAYER_CONNECT);
+  // get data from pure Character
   o.append_uint32(uid);
-  o.append_string(name);
-  o.append_float(position.x);
-  o.append_float(position.y);
-  o.append_uint16(color);  //------------
+  o.append_string(character.Name);
+  o.append_float(character.Location.Position.x);
+  o.append_float(character.Location.Position.y);
+  o.append_uint32(character.Status.HP);
+  o.append_uint32(character.Status.SP);
+  o.append_string(character.Status.Job);
+  o.append_uint32(character.Status.Level);
+  o.append_uint32(character.Status.Equipment.Head);
+  o.append_uint32(character.Status.Equipment.Body);
+  o.append_uint32(character.Status.Equipment.Weapon);
   o.finish();
   return o.buffer;
 }
 
 packet.make_multiplayer_control = function (datas) {
-  let o = new packet_writer(packet.SC_MULTIPLAYER_CONTROL);
+  let o = new packet_writer(packet.SC_ONLINE_PLAYER_CONTROL);
   o.append_uint16(datas.length); //add length first to tell client before loop
   for (let i = 0; i < datas.length; i++) {
-    o.append_uint32(datas[i].uid);
-    o.append_float(datas[i].position.x);
-    o.append_float(datas[i].position.y);
-    o.append_float(datas[i].velocity.x);
-    o.append_float(datas[i].velocity.y);
-    o.append_float(datas[i].scaleX);
-  }
-  o.finish();
+    // UID, Name, HP,SP,Job,Level,Equipment,Position only
+    //current : uid, position, velocity, scaleX , animation
+    o.append_uint32(datas[i].UID);
+    o.append_float(datas[i].Position.x);
+    o.append_float(datas[i].Position.y);
+    o.append_float(datas[i].Velocity.x);
+    o.append_float(datas[i].Velocity.y);
+    o.append_float(datas[i].ScaleX);
+    o.append_int8(datas[i].Animation);
+  } 
+  o.finish(); //[Bug(5)]ทำงานก่อนที่ for จะเสร็จ ??
   return o.buffer;
 }
 
-packet.make_multiplayer_in_world = function (players) {
+packet.make_multiplayer_in_same_map = function (players) {
   let o = new packet_writer(packet.SC_MULTIPLAYER_PLAYERS_IN_WORLD);
+  //get data from temp
   o.append_uint16(players.length);
   for (let i = 0; i < players.length; i++) {
-    o.append_uint32(players[i].uid);
-    o.append_string(players[i].name);
-    o.append_float(players[i].position.x);
-    o.append_float(players[i].position.y);
-    o.append_uint16(players[i].color);
+    o.append_uint32(players[i].UID);
+    o.append_string(players[i].CharacterName);
+    o.append_float(players[i].Location.Position.x);
+    o.append_float(players[i].Location.Position.y);
+    o.append_uint32(players[i].HP);
+    o.append_uint32(players[i].SP);
+    o.append_string(players[i].Job);
+    o.append_uint32(players[i].Level);
+    o.append_uint32(players[i].Equipment.Head);
+    o.append_uint32(players[i].Equipment.Body);
+    o.append_uint32(players[i].Equipment.Weapon);
   }
   o.finish();
   return o.buffer;
 }
 
 packet.make_multiplayer_disconnect = function (uid) {
-  let o = new packet_writer(packet.SC_MULTIPLAYER_DISCONNET);
+  let o = new packet_writer(packet.SC_ONLINE_PLAYER_DISCONNECT);
   o.append_uint32(uid);
   o.finish();
   return o.buffer;
@@ -320,6 +390,7 @@ function convertCharacterDataToPacketData(packet,character){
   packet.append_int32(character.Status.EXP);   // EXP
   packet.append_int32(character.Status.HP);    // HP
   packet.append_int32(character.Status.SP);    // SP
+  packet.append_int32(character.Status.MaxEXP);// Max EXP
   packet.append_int32(character.Status.MaxHP); // Max HP
   packet.append_int32(character.Status.MaxSP); // Max SP
   packet.append_int32(character.Status.ATK);   // ATK
@@ -332,8 +403,8 @@ function convertCharacterDataToPacketData(packet,character){
   //////////////////////////////////////////
   // Location
   packet.append_string(character.Location.Map);  // Current Map
-  packet.append_double(character.Location.X);    // X
-  packet.append_double(character.Location.Y);    // Y
+  packet.append_float(character.Location.Position.x);    // X
+  packet.append_float(character.Location.Position.y);    // Y
   //////////////////////////////////////////
   // Inventory
   packet.append_int32(character.Inventory.Gold);   // Gold
