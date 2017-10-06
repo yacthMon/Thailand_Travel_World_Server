@@ -411,7 +411,7 @@ function convertCharacterDataToPacketData(packet,character){
   if (character.Inventory.Items) { // if have Item
     packet.append_int8(character.Inventory.Items.length); // append length of item
     for (let j = 0; j < character.Inventory.Items.length; j++) {// Append data for each Itme
-      let item = character.Inventory.Items[i];
+      let item = character.Inventory.Items[j];
       packet.append_int32(item.ItemId);
       packet.append_int16(item.Amount);
     }
