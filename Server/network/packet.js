@@ -26,12 +26,14 @@ let packet = {
   CS_CREATE_CHARACTER: 11014,
   CS_AUTHENTICATION_WITH_FACEBOOK: 11015,
   CS_REGISTER_FACEBOOK_DATA: 11016,
-  /* 12xxx for Multiplayer*/
+  /* 12xxx for Online Realtime*/
   CS_REQUEST_ENTER_WORLD: 12020,
   CS_SEND_PLAYER_MOVING: 12021,
   CS_EXIT_WORLD: 12022,
   CS_PLAYER_CHANGE_MAP: 12023,
   CS_SEND_PLAYER_STATUS: 12024,
+  CS_INVENTORY_ADD: 12025,
+  CS_INVENTORY_INCREASE: 12026,
   CS_CHAT: 12101,
   CS_NOTIFICATION: 12102,
 
@@ -53,7 +55,7 @@ let packet = {
   SC_CHARACTER_CREATE_SUCCESS: 21017,
   SC_CHARACTER_CREATE_FAILED: 21018,
   SC_FACEBOOK_REQUEST_REGISTER: 21019,
-  /* 22xxx for Multiplayer*/
+  /* 22xxx for Online Realtime*/
   SC_MULTIPLAYER_PLAYERS_IN_WORLD: 22020,
   SC_MULTIPLAYER_ENTER_WORLD_GRANT: 22021,
   SC_MULTIPLAYER_ENTER_WORLD_DENIED: 22022,
@@ -174,6 +176,18 @@ packet[packet.CS_SEND_PLAYER_STATUS] = function (remoteProxy, data) {
 
 packet[packet.CS_EXIT_WORLD] = (remoteProxy, data) => {
   remoteProxy.playerExitWorld();
+}
+
+packet[packet.CS_INVENTORY_ADD] = (remoteProxy, data) => {
+  let itemId = data.read_uint32();
+  let amount = data.read_uint16();
+  remoteProxy.addItemToInventory(itemId, amount);
+}
+
+packet[packet.CS_INVENTORY_INCREASE] = (remoteProxy, data) => {
+  let itemId = data.read_uint32();
+  let amount = data.read_uint16();
+  remoteProxy.increaseItemInventory(itemId, amount);
 }
 
 packet[packet.CS_CHAT] = function (remoteProxy, data) {
