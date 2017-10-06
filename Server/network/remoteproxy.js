@@ -256,6 +256,32 @@ class RemoteProxy extends server.RemoteProxy {
     status.Equipment = this.character.Status.Equipment;
     this.character.Status = status;
   }
+// --------- Inventory
+  addItemToInventory(itemId, amount){
+    this.character.Inventory.Items.push({ItemId: itemId, Amount: amount});
+  }
+
+  increaseItemInventory(itemId, amount){
+    let indexOfItem = this.character.Inventory.Items.findIndex((item) => { return item.ItemId == itemId });
+    if(indexOfItem > -1){
+      this.character.Inventory.Items[indexOfItem].Amount += amount;
+    }
+  }
+
+  decreaseItemInventory(itemId, amount){
+    let indexOfItem = this.character.Inventory.Items.findIndex((item) => { return item.ItemId == itemId });
+    if(indexOfItem > -1){
+      this.character.Inventory.Items[indexOfItem].Amount -= amount;
+    }
+  }
+
+  removeItemFromInventory(itemId, amount){
+    let indexOfItem = this.character.Inventory.Items.findIndex((item) => { return item.ItemId == itemId });
+    if (indexOfItem > -1) {
+      this.character.Inventory.Items.splice(indexOfItem,1);
+    }
+  }
+// --------- Inventory
   chat(msg) {
     console.log('RemoteProxy chat: ' + msg)
     // world.broadcast(packet.make_chat(msg))
