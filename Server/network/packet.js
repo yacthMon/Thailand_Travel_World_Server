@@ -321,9 +321,10 @@ packet.make_multiplayer_connect = function (uid, character) {
   o.append_string(character.Name);
   o.append_float(character.Location.Position.x);
   o.append_float(character.Location.Position.y);
-  o.append_uint32(character.Status.HP);
-  o.append_uint32(character.Status.SP);
+  o.append_string(character.Status.Gender);
   o.append_string(character.Status.Job);
+  o.append_uint32(character.Status.HP);
+  o.append_uint32(character.Status.SP);  
   o.append_uint32(character.Status.Level);
   o.append_uint32(character.Status.Equipment.Head);
   o.append_uint32(character.Status.Equipment.Body);
@@ -359,6 +360,8 @@ packet.make_multiplayer_in_same_map = function (players) {
     o.append_string(players[i].CharacterName);
     o.append_float(players[i].Location.Position.x);
     o.append_float(players[i].Location.Position.y);
+    o.append_string(players[i].Gender);
+    o.append_string(players[i].Job);
     o.append_uint32(players[i].HP);
     o.append_uint32(players[i].SP);
     o.append_string(players[i].Job);
@@ -399,16 +402,17 @@ function convertCharacterDataToPacketData(packet,character){
   packet.append_string(character.Name);// character name  
   //////////////////////////////////////////      
   ///////////// Status
-  packet.append_string(character.Status.Job);  // Job      
-  packet.append_int8(character.Status.Level);  // Level
-  packet.append_int32(character.Status.EXP);   // EXP
-  packet.append_int32(character.Status.HP);    // HP
-  packet.append_int32(character.Status.SP);    // SP
-  packet.append_int32(character.Status.MaxEXP);// Max EXP
-  packet.append_int32(character.Status.MaxHP); // Max HP
-  packet.append_int32(character.Status.MaxSP); // Max SP
-  packet.append_int32(character.Status.ATK);   // ATK
-  packet.append_int32(character.Status.DEf);   // DEF
+  packet.append_string(character.Status.Gender); // Gender
+  packet.append_string(character.Status.Job);    // Job      
+  packet.append_int8(character.Status.Level);    // Level
+  packet.append_int32(character.Status.EXP);     // EXP
+  packet.append_int32(character.Status.HP);      // HP
+  packet.append_int32(character.Status.SP);      // SP
+  packet.append_int32(character.Status.MaxEXP);  // Max EXP
+  packet.append_int32(character.Status.MaxHP);   // Max HP
+  packet.append_int32(character.Status.MaxSP);   // Max SP
+  packet.append_int32(character.Status.ATK);     // ATK
+  packet.append_int32(character.Status.DEf);     // DEF
   //////////////////////////////////////////
   // Equipment
   packet.append_int16(character.Status.Equipment.Head);    // HEAD

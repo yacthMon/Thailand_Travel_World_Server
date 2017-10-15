@@ -30,6 +30,8 @@ class World {
                     "UID": otherRemote.userdata._id,
                     "CharacterName": character.Name,
                     "Location": character.Location,
+                    "Gender":character.Status.Gender,
+                    "Job":character.Status.Job,
                     "HP": character.Status.HP,
                     "SP": character.Status.SP,
                     "Job": character.Status.Job,
