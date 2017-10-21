@@ -11,11 +11,12 @@ let spawnerList = [];
 
 spawnMonster = (spawner)=>{
      //check if already full monster for this spawner yet ?
-     
+     let monster = new Monster();
+     monsterList.push(monster);
 }
-
+/*
 let spawnInterval = setInterval(()=>{
     spawnerList.forEach((spawner)=>{
         spawnMonster(spawner);
     })
-}, 60000); // Check and spawn new monster for every 1 minute
+}, 60000); // Check and spawn new monster for every 1 minute*/

@@ -1,5 +1,6 @@
 let packet = require('../network/packet');
 let monitor = require('../server').monitor;
+let MonsterControl = require('../controllers/monsterController');
 let AOIamount = 10; // ช่วงระยะห่างระหว่าง Client ที่จะรับข้อมูล
 // let monitor = console;
 class World {
@@ -8,6 +9,7 @@ class World {
         this.responseTime = 100;
         this.responseTimer = undefined;
         this.responseDatas = [];
+        this.monsterControl = new MonsterControl();
         /* Response data 
         uid : user id,        
         location : position(x,y) & currentMap,
@@ -91,7 +93,8 @@ class World {
                 // ---------------- AOI (Area of Interest) --------
                 this.remotes.forEach((remote) => { // for All remote in world
                     // let position = remote.character.Location.position; // get remote's current position;
-                    let dataToSend = [];
+                    let playerDataToSend = [];
+                    let monsterDataToSend = [];
                     this.responseDatas.forEach((otherPlayerData) => { // for All response data
                         // if (Math.abs(position.x - data.position.x) <= AOIamount) { //Check if in distance
                         //     tempDatas.push(data); // Add data that in distance to tempData;
@@ -99,15 +102,25 @@ class World {
                         // }
                         if (otherPlayerData.Map === remote.character.Location.Map) { // if otherPlayer in same map
                             dataToSend.push(otherPlayerData);
-                        }
+                        }                        
                     });                    
+                    
+                    this.monsterControl.monsterList.forEach((monster)=>{
+                        if(monster.Location.Map == remote.character.Location.Map){
+                            monsterDataToSend.push(monster);
+                        }
+                    })
+                    remote.send(packet.make_monster_in_world(monsterDataToSend));
                     remote.send(packet.make_multiplayer_control(dataToSend)); // send temp data to remote
                 })
-                // ---------------- AOI (Area of Interest) --------                                
+                // ---------------- AOI (Area of Interest) --------          
+                
             } else {
                 // console.log("[World] No one in this world");
             }
         }, this.responseTime);
+
+        
     }
 
     stopQueueResponse() {
