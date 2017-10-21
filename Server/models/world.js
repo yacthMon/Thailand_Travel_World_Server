@@ -24,6 +24,7 @@ class World {
     }
 
     addRemote(remote) {
+        let monsterInWorld = [];
         let playerInWorld = [];
         this.remotes.forEach((otherRemote) => { // stored players that already in world to playerInWorld array
             if (otherRemote.character.Location.Map === remote.character.Location.Map) { // if in same map
@@ -44,6 +45,12 @@ class World {
                 otherRemote.send(packet.make_multiplayer_connect(remote.userdata._id, remote.character));
             }
         })
+        this.monsterControl.monsterList.forEach((monster)=>{
+            if(monster.Location.Map === remote.character.Location.Map){
+                monsterInWorld.push(monster);
+            }
+        });
+        remote.send(packet.make_online_monster_in_world(monsterInWorld));
         remote.send(packet.make_multiplayer_in_same_map(playerInWorld)); // send playerInWorld to the client who just enter
         this.remotes.push(remote) // add this client to retmoes               
     }
@@ -101,7 +108,7 @@ class World {
                         // } else {//not in distance
                         // }
                         if (otherPlayerData.Map === remote.character.Location.Map) { // if otherPlayer in same map
-                            dataToSend.push(otherPlayerData);
+                            playerDataToSend.push(otherPlayerData);
                         }                        
                     });                    
                     
@@ -110,8 +117,8 @@ class World {
                             monsterDataToSend.push(monster);
                         }
                     })
-                    remote.send(packet.make_monster_in_world(monsterDataToSend));
-                    remote.send(packet.make_multiplayer_control(dataToSend)); // send temp data to remote
+                    //remote.send(packet.make_online_monster_in_world(monsterDataToSend));// send temp monster data to remote
+                    remote.send(packet.make_multiplayer_control(playerDataToSend)); // send temp player data to remote
                 })
                 // ---------------- AOI (Area of Interest) --------          
                 
