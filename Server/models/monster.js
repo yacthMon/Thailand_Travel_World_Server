@@ -1,6 +1,6 @@
 class Monster {
     constructor() {
-        this.ID = 0;
+        this.ID = 10004;
         
         this.Status = {
             Name: "สามล้อคลั่ง",
@@ -12,7 +12,7 @@ class Monster {
             MovementSpeed: 10,
             State: "Idle"
         }
-        
+
         this.Location = {
             TargetPosition: { x: 0},
             CurrentPosition: { x: 0,y:0}, //Use client physic for real

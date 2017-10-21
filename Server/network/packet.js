@@ -388,7 +388,7 @@ packet.make_multiplayer_disconnect = function (uid) {
   return o.buffer;
 }
 //------------ Monster Part
-packet.make_online_monster_in_world = (monsters)=>{
+packet.make_online_monster_in_world = (monsters)=>{  
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_IN_WORLD);
   o.append_uint8(monsters.length);
   for (var i = 0; i < monsters.length; i++) {

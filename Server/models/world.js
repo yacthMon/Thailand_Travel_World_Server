@@ -9,7 +9,7 @@ class World {
         this.responseTime = 100;
         this.responseTimer = undefined;
         this.responseDatas = [];
-        this.monsterControl = MonsterControl;
+        this.monsterControl = new MonsterControl();
         /* Response data 
         uid : user id,        
         location : position(x,y) & currentMap,
