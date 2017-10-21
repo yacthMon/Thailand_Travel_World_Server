@@ -1,13 +1,7 @@
 class Monster {
     constructor() {
-        this.monsterId = 0;
-        this.Location = {
-            TargetPosition: { x: 0},
-            CurrentPosition: { x: 0}, //Use client physic for real
-            Map: "Bangkok"
-        };
-        this.movingInterval = undefined;
-
+        this.ID = 0;
+        
         this.Status = {
             Name: "สามล้อคลั่ง",
             HP: 100,
@@ -18,6 +12,13 @@ class Monster {
             MovementSpeed: 10,
             State: "Idle"
         }
+        
+        this.Location = {
+            TargetPosition: { x: 0},
+            CurrentPosition: { x: 0,y:0}, //Use client physic for real
+            Map: "Bangkok"
+        };
+        this.movingInterval = undefined;
         this.TargetPlayer = undefined;
 
         this.ItemPool = [10000, 10002];
