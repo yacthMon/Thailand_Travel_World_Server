@@ -397,7 +397,7 @@ packet.make_online_monster_in_world = (monsters)=>{
     o.append_string(monster.Status.Name);
     o.append_uint32(monster.Status.HP);
     o.append_uint32(monster.Status.MaxHP);
-    o.append_uint16(monster.Status.DEf);
+    o.append_uint32(monster.Status.DEF);
     o.append_uint32(monster.EXP);
     o.append_uint8(monster.Level);    
     o.append_float(monster.Location.CurrentPosition.x);

@@ -1,10 +1,10 @@
-const Monster = require('./monster');
+const Monster = require('../models/monster');
 
 const sampleSpawner = {
     ID:0,
-    LocationSpanwer = {Start:{x:0,y:0} , End:{x:10,y:0}, Map:"Bangkok"},
-    MonsterID = 10000,
-    MaxAmount = 5
+    LocationSpanwer: {Start:{x:0,y:0} , End:{x:10,y:0}, Map:"Bangkok"},
+    MonsterID: 10000,
+    MaxAmount: 5
 }
 let monsterList = [];
 let spawnerList = [];
