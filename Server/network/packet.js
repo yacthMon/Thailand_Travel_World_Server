@@ -62,6 +62,13 @@ let packet = {
   SC_ONLINE_PLAYER_CONNECT: 22023,
   SC_ONLINE_PLAYER_CONTROL: 22024,
   SC_ONLINE_PLAYER_DISCONNECT: 22025,
+  //------- Monster Part
+  SC_ONLINE_MONSTER_IN_WORLD: 22200,
+  SC_ONLINE_MONSTER_SPAWN: 22201,
+  SC_ONLINE_MONSTER_CONTROL: 22202,
+  SC_ONLINE_MONSTER_HURT: 22203,
+  SC_ONLINE_MONSTER_ELIMINATE: 22204,
+  //------- Community Part
   SC_CHAT: 22026,
   SC_NOTIFICATION: 22027,
 };
@@ -380,7 +387,47 @@ packet.make_multiplayer_disconnect = function (uid) {
   o.finish();
   return o.buffer;
 }
+//------------ Monster Part
+packet.make_monster_in_world = (monsters)=>{
+  let o = new packet_writer(packet.SC_ONLINE_MONSTER_IN_WORLD);
+  o.append_uint8(monsters.length);
+  for (var i = 0; i < monsters.length; i++) {
+    let monster = monsters[i];
+    o.append_uint32(monster.ID);
+    o.append_string(monster.Status.Name);
+    o.append_uint32(monster.Status.HP);
+    o.append_uint32(monster.Status.MaxHP);
+    o.append_uint16(monster.Status.DEf);
+    o.append_uint32(monster.EXP);
+    o.append_uint8(monster.Level);    
+    o.append_float(monster.Location.CurrentPosition.x);
+    o.append_float(monster.Location.CurrentPosition.y);
+  }
+  o.finish();
+  return o.buffer;
+}
 
+packet.make_monster_spawn = (monsters)=>{
+  let o = new packet_writer(packet.SC_ONLINE_MONSTER_SPAWN);
+
+  o.finish();
+  return o.buffer;
+}
+
+packet.make_monster_control = (monsters)=>{
+  let o = new packet_writer(packet.SC_ONLINE_MONSTER_CONTROL);
+
+  o.finish();
+  return o.buffer;
+}
+
+packet.make_monster_eliminate = (monsters)=>{
+  let o = new packet_writer(packet.SC_ONLINE_MONSTER_ELIMINATE);
+
+  o.finish();
+  return o.buffer;
+}
+//------------- Commuinity Part
 packet.make_chat = function (msg) {
   let o = new packet_writer(packet.SC_CHAT);
   o.append_string(msg);
