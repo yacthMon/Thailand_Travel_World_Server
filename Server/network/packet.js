@@ -388,7 +388,7 @@ packet.make_multiplayer_disconnect = function (uid) {
   return o.buffer;
 }
 //------------ Monster Part
-packet.make_monster_in_world = (monsters)=>{
+packet.make_online_monster_in_world = (monsters)=>{
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_IN_WORLD);
   o.append_uint8(monsters.length);
   for (var i = 0; i < monsters.length; i++) {
@@ -407,21 +407,21 @@ packet.make_monster_in_world = (monsters)=>{
   return o.buffer;
 }
 
-packet.make_monster_spawn = (monsters)=>{
+packet.make_online_monster_spawn = (monsters)=>{
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_SPAWN);
 
   o.finish();
   return o.buffer;
 }
 
-packet.make_monster_control = (monsters)=>{
+packet.make_online_monster_control = (monsters)=>{
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_CONTROL);
 
   o.finish();
   return o.buffer;
 }
 
-packet.make_monster_eliminate = (monsters)=>{
+packet.make_online_monster_eliminate = (monsters)=>{
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_ELIMINATE);
 
   o.finish();
