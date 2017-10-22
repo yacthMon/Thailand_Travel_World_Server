@@ -1,9 +1,10 @@
 let monitor = require('../server').monitor;
+let world = require('../server').world;
 
 class Monster {
     constructor() {
         this.ID = 1;
-        this.monsterID = 10004; 
+        this.monsterID = 10004;
         this.Status = {
             Name: "สามล้อคลั่ง",
             HP: 100,
@@ -16,15 +17,15 @@ class Monster {
         }
 
         this.Location = {
-            TargetPosition: { x: 0},
-            CurrentPosition: { x: 0,y:0}, //Use client physic for real
+            TargetPosition: { x: 0 },
+            CurrentPosition: { x: 0, y: 0 }, //Use client physic for real
             Map: "Bangkok"
         };
         this.movingInterval = undefined;
         this.TargetPlayer = undefined;
         this.normalMoving();
         this.ItemPool = [10000, 10002];
-        //send monsterData to client
+        //send monsterData to client (Spawn)
     }
 
     goToTarget() {
@@ -32,16 +33,24 @@ class Monster {
             if (findDistance(this.Location.CurrentPosition.x, this.Location.TargetPosition.x)
                 > 1) {
                 this.Status.State = "Moving";
-                monitor.log("Monster state : Moving");
+                // monitor.log("Monster state : Moving");
                 let moveValue = (findDirection(this.Location.CurrentPosition.x, this.Location.TargetPosition.x)
-                    * this.Status.MovementSpeed)* (90/1000);
+                    * this.Status.MovementSpeed) * (90 / 1000);
                 this.Location.CurrentPosition.x += moveValue;
-                monitor.log(this.Location.CurrentPosition.x);
                 //send data to temp
+                world.addMonsterDataToQueue({
+                    ID: this.ID,
+                    HP: this.Status.HP,
+                    Map: this.Location.Map,
+                    Position: {
+                        x: this.Location.CurrentPosition.x,
+                        y: this.Location.CurrentPosition.y
+                    }
+                });
             } else {
                 //we reach the target
                 this.Status.State = "Idle";
-                monitor.log("Monster state : Idle");
+                // monitor.log("Monster state : Idle");
                 clearInterval(this.movingInterval);
                 this.normalMoving();
             }
@@ -67,10 +76,10 @@ class Monster {
 
     normalMoving() {
         setTimeout(() => {
-            let movingValue = Math.random()*8;
-            movingValue *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+            let movingValue = Math.random() * 8;
+            movingValue *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
             this.setTargetPosition(movingValue);
-        }, ((Math.random() * 5) + 3)*1000);
+        }, ((Math.random() * 5) + 3) * 1000);
     }
 }
 

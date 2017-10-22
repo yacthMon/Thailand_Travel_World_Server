@@ -1,6 +1,5 @@
 let packet = require('../network/packet');
 let monitor = require('../server').monitor;
-let MonsterControl = require('../controllers/monsterController');
 let AOIamount = 10; // ช่วงระยะห่างระหว่าง Client ที่จะรับข้อมูล
 // let monitor = console;
 class World {
@@ -8,8 +7,9 @@ class World {
         this.remotes = []
         this.responseTime = 100;
         this.responseTimer = undefined;
-        this.responseDatas = [];
-        this.monsterControl = new MonsterControl();
+        this.responsePlayerDatas = [];
+        this.responseMonsterDatas = [];
+        this.monsterControl = undefined;
         /* Response data 
         uid : user id,        
         location : position(x,y) & currentMap,
@@ -77,11 +77,20 @@ class World {
     }
 
     addPlayerDataToQueue(data) {
-        let indexOfExistData = this.responseDatas.findIndex((dataSet) => { return dataSet.UID == data.UID });
+        let indexOfExistData = this.responsePlayerDatas.findIndex((dataSet) => { return dataSet.UID == data.UID });
         if (indexOfExistData > -1) {
-            this.responseDatas.splice(indexOfExistData, 1, data);
+            this.responsePlayerDatas.splice(indexOfExistData, 1, data);
         } else {
-            this.responseDatas.push(data)
+            this.responsePlayerDatas.push(data)
+        }
+    }
+
+    addMonsterDataToQueue(data){
+        let indexOfExistData = this.responseMonsterDatas.findIndex((dataSet) => { return dataSet.ID == data.ID });
+        if (indexOfExistData > -1) {
+            this.responseMonsterDatas.splice(indexOfExistData, 1, data);
+        } else {
+            this.responseMonsterDatas.push(data)
         }
     }
 
@@ -102,7 +111,7 @@ class World {
                     // let position = remote.character.Location.position; // get remote's current position;
                     let playerDataToSend = [];
                     let monsterDataToSend = [];
-                    this.responseDatas.forEach((otherPlayerData) => { // for All response data
+                    this.responsePlayerDatas.forEach((otherPlayerData) => { // for All response data
                         // if (Math.abs(position.x - data.position.x) <= AOIamount) { //Check if in distance
                         //     tempDatas.push(data); // Add data that in distance to tempData;
                         // } else {//not in distance
@@ -112,12 +121,12 @@ class World {
                         }                        
                     });                    
                     
-                    this.monsterControl.monsterList.forEach((monster)=>{
-                        if(monster.Location.Map == remote.character.Location.Map){
-                            monsterDataToSend.push(monster);
+                    this.responseMonsterDatas.forEach((monsterData)=>{
+                        if(monsterData.Map == remote.character.Location.Map){
+                            monsterDataToSend.push(monsterData);
                         }
-                    })
-                    //remote.send(packet.make_online_monster_in_world(monsterDataToSend));// send temp monster data to remote
+                    });
+                    remote.send(packet.make_online_monster_control(monsterDataToSend));// send temp monster data to remote
                     remote.send(packet.make_multiplayer_control(playerDataToSend)); // send temp player data to remote
                 })
                 // ---------------- AOI (Area of Interest) --------          

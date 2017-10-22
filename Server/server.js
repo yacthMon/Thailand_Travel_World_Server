@@ -4,10 +4,16 @@ let monitor = new Monitor();
 exports.monitor = monitor;
 
 let World = require('./models/world')
-let world = new World()
+let world = new World();
 world.responseTime = 100;
 world.startQueueResponse();
 exports.world = world;
+
+let MonsterController = require('./controllers/monsterController');
+let monsterController = new MonsterController();
+monsterController.spawnMonster();
+world.monsterControl = monsterController;
+exports.monsterController = monsterController;
 
 let server = require('dgt-net').server;
 let packet;// = require('./network/packet');

@@ -10,7 +10,7 @@ class MonsterController {
     constructor() {
         this.monsterList = [];
         this.spawnerList = [];
-        this.spawnMonster();
+        // this.spawnMonster();
     }
     spawnMonster(spawner){
         //check if already full monster for this spawner yet ?
