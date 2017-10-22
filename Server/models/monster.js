@@ -2,29 +2,32 @@ let monitor = require('../server').monitor;
 let world = require('../server').world;
 
 class Monster {
-    constructor() {
-        this.ID = 1;
-        this.monsterID = 10004;
-        this.Status = {
-            Name: "สามล้อคลั่ง",
-            HP: 100,
-            MaxHP: 100,
-            DEF: 5,
-            EXP: 10,
-            Level: 1,
-            MovementSpeed: 1,
-            State: "Idle"
-        }
+    constructor(data) {
+        if (data) {
+            this.ID = data.ID;
+            this.monsterID = data.monsterID;
+            this.Status = data.Status;
+            this.Location = data.Location;
+            this.ItemPool = data.ItemPool;
+        } else {
+            this.ID = ID;
+            this.monsterID = 10004;
+            this.Status = {
+                HP: 100,
+                MovementSpeed: 3,
+                State: "Idle"
+            }
 
-        this.Location = {
-            TargetPosition: { x: 0 },
-            CurrentPosition: { x: 0, y: 0 }, //Use client physic for real
-            Map: "Bangkok"
-        };
+            this.Location = {
+                TargetPosition: { x: 0 },
+                CurrentPosition: { x: 0, y: 0 }, //Use client physic for real
+                Map: "Bangkok"
+            };            
+            this.ItemPool = [{ItemID:100004, Rate:60.5}];
+        }
         this.movingInterval = undefined;
         this.TargetPlayer = undefined;
-        this.normalMoving();
-        this.ItemPool = [10000, 10002];
+        //this.normalMoving();
         //send monsterData to client (Spawn)
     }
 

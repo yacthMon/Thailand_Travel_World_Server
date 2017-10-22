@@ -11,7 +11,6 @@ exports.world = world;
 
 let MonsterController = require('./controllers/monsterController');
 let monsterController = new MonsterController();
-monsterController.spawnMonster();
 world.monsterControl = monsterController;
 exports.monsterController = monsterController;
 
@@ -61,6 +60,7 @@ db.connect().then(()=>{
 },()=>{
   monitor.log("Database class create connect       [{red-fg}FAILED{/red-fg}]");
 });
+monsterController.spawnMonsterToSpawnList();
 exports.db = db;
 packet = require('./network/packet');
 remoteProxy = require('./network/remoteproxy');
