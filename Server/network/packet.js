@@ -396,12 +396,7 @@ packet.make_online_monster_in_world = (monsters)=>{
     let monster = monsters[i];
     o.append_uint32(monster.ID);
     o.append_uint32(monster.monsterID);
-    o.append_string(monster.Status.Name);
     o.append_uint32(monster.Status.HP);
-    o.append_uint32(monster.Status.MaxHP);
-    o.append_uint32(monster.Status.DEF);
-    o.append_uint32(monster.EXP);
-    o.append_uint8(monster.Level);    
     o.append_float(monster.Location.CurrentPosition.x);
     o.append_float(monster.Location.CurrentPosition.y);
   }
