@@ -394,6 +394,7 @@ packet.make_online_monster_in_world = (monsters)=>{
   for (var i = 0; i < monsters.length; i++) {
     let monster = monsters[i];
     o.append_uint32(monster.ID);
+    o.append_uint32(monster.monsterID);
     o.append_string(monster.Status.Name);
     o.append_uint32(monster.Status.HP);
     o.append_uint32(monster.Status.MaxHP);
@@ -416,7 +417,14 @@ packet.make_online_monster_spawn = (monsters)=>{
 
 packet.make_online_monster_control = (monsters)=>{
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_CONTROL);
-
+  o.append_uint8(monsters.length);
+  for (var i = 0; i < monsters.length; i++) {
+    let monster = monsters[i];
+    o.append_uint32(monster.ID);
+    o.append_uint32(monster.Status.HP);    
+    o.append_float(monster.Location.CurrentPosition.x);
+    o.append_float(monster.Location.CurrentPosition.y);
+  }
   o.finish();
   return o.buffer;
 }

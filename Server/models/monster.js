@@ -1,7 +1,9 @@
+let monitor = require('../server').monitor;
+
 class Monster {
     constructor() {
-        this.ID = 10004;
-        
+        this.ID = 1;
+        this.monsterID = 10004; 
         this.Status = {
             Name: "สามล้อคลั่ง",
             HP: 100,
@@ -9,7 +11,7 @@ class Monster {
             DEF: 5,
             EXP: 10,
             Level: 1,
-            MovementSpeed: 10,
+            MovementSpeed: 1,
             State: "Idle"
         }
 
@@ -20,24 +22,26 @@ class Monster {
         };
         this.movingInterval = undefined;
         this.TargetPlayer = undefined;
-
+        this.normalMoving();
         this.ItemPool = [10000, 10002];
         //send monsterData to client
     }
 
     goToTarget() {
         this.movingInterval = setInterval(() => {
-            if (findistance(this.Location.CurrentPosition.x, this.Location.TargetPosition.x)
-                <= 1) {
+            if (findDistance(this.Location.CurrentPosition.x, this.Location.TargetPosition.x)
+                > 1) {
                 this.Status.State = "Moving";
-                let moveValue = findDirection(this.Location.CurrentPosition.x, this.Location.TargetPosition.x)
-                    * this.Status.MovementSpeed;
+                monitor.log("Monster state : Moving");
+                let moveValue = (findDirection(this.Location.CurrentPosition.x, this.Location.TargetPosition.x)
+                    * this.Status.MovementSpeed)* (90/1000);
                 this.Location.CurrentPosition.x += moveValue;
-
+                monitor.log(this.Location.CurrentPosition.x);
                 //send data to temp
             } else {
                 //we reach the target
                 this.Status.State = "Idle";
+                monitor.log("Monster state : Idle");
                 clearInterval(this.movingInterval);
                 this.normalMoving();
             }
@@ -63,8 +67,10 @@ class Monster {
 
     normalMoving() {
         setTimeout(() => {
-            this.setTargetPosition(Math.random()*8);
-        }, (Math.random() * 5) + 3);
+            let movingValue = Math.random()*8;
+            movingValue *= Math.floor(Math.random()*2) == 1 ? 1 : -1;
+            this.setTargetPosition(movingValue);
+        }, ((Math.random() * 5) + 3)*1000);
     }
 }
 
