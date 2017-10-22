@@ -126,8 +126,9 @@ class World {
                             monsterDataToSend.push(monsterData);
                         }
                     });
-                    remote.send(packet.make_online_monster_control(monsterDataToSend));// send temp monster data to remote
-                    remote.send(packet.make_multiplayer_control(playerDataToSend)); // send temp player data to remote
+                    //remote.send(packet.make_online_monster_control(monsterDataToSend));// send temp monster data to remote
+                    //remote.send(packet.make_multiplayer_control(playerDataToSend)); // send temp player data to remote
+                    remote.send(packet.make_online_realtime_control(playerDataToSend,monsterDataToSend));
                 })
                 // ---------------- AOI (Area of Interest) --------          
                 

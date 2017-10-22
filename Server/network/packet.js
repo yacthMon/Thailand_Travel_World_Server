@@ -56,6 +56,7 @@ let packet = {
   SC_CHARACTER_CREATE_FAILED: 21018,
   SC_FACEBOOK_REQUEST_REGISTER: 21019,
   /* 22xxx for Online Realtime*/
+  SC_ONLINE_REALTIME_CONTROL: 22000,
   SC_MULTIPLAYER_PLAYERS_IN_WORLD: 22020,
   SC_MULTIPLAYER_ENTER_WORLD_GRANT: 22021,
   SC_MULTIPLAYER_ENTER_WORLD_DENIED: 22022,
@@ -432,6 +433,33 @@ packet.make_online_monster_control = (monsters)=>{
 packet.make_online_monster_eliminate = (monsters)=>{
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_ELIMINATE);
 
+  o.finish();
+  return o.buffer;
+}
+
+packet.make_online_realtime_control = (playerDatas,monsterDatas)=>{
+  let o = new packet_writer(packet.SC_ONLINE_REALTIME_CONTROL);
+  // player
+  o.append_uint16(playerDatas.length); //add length first to tell client before loop
+  for (let i = 0; i < playerDatas.length; i++) {
+    // UID, Name, HP,SP,Job,Level,Equipment,Position only
+    //current : uid, position, velocity, scaleX , animation
+    o.append_uint32(playerDatas[i].UID);
+    o.append_float(playerDatas[i].Position.x);
+    o.append_float(playerDatas[i].Position.y);
+    o.append_float(playerDatas[i].Velocity.x);
+    o.append_float(playerDatas[i].Velocity.y);
+    o.append_float(playerDatas[i].ScaleX);
+    o.append_int8(playerDatas[i].Animation);
+  } 
+  // monster
+  o.append_uint8(monsterDatas.length);
+  for (var i = 0; i < monsterDatas.length; i++) {    
+    o.append_uint32(monsterDatas[i].ID);
+    o.append_uint32(monsterDatas[i].HP);    
+    o.append_float(monsterDatas[i].Position.x);
+    o.append_float(monsterDatas[i].Position.y);
+  }
   o.finish();
   return o.buffer;
 }
