@@ -435,8 +435,8 @@ packet.make_online_monster_control = (monsters)=>{ // not used
 }
 
 packet.make_online_monster_eliminate = (monsterID)=>{
-  let o = new packet_writer(packet.SC_ONLINE_MONSTER_ELIMINATE);
-  o.append_uint32(monsterId);
+  let o = new packet_writer(packet.SC_ONLINE_MONSTER_ELIMINATE);  
+  o.append_uint32(monsterID);
   o.finish();
   return o.buffer;
 }

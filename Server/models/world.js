@@ -127,6 +127,14 @@ class World {
         return false;
     }
 
+    eliminateMonster(id,map){
+        this.remotes.forEach((remote) => {
+            if(remote.character.Location.Map == map){
+                remote.send(packet.make_online_monster_eliminate(id));
+            }
+        });
+    }
+
     startQueueResponse() {
         this.responseTimer = setInterval(() => {
             if (this.countPlayer() > 0) {
@@ -146,7 +154,7 @@ class World {
                         //     tempDatas.push(data); // Add data that in distance to tempData;
                         // } else {//not in distance
                         // }
-                        if (otherPlayerData.Map === remote.character.Location.Map) { // if otherPlayer in same map
+                        if (otherPlayerData.Map == remote.character.Location.Map) { // if otherPlayer in same map
                             playerDataToSend.push(otherPlayerData);
                         }
                     });

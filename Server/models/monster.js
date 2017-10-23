@@ -79,8 +79,11 @@ class Monster {
         } else {
             //Find target to follow
             monitor.debug("[Monster] got attack :(");
+            let indexOfExistData = this.damageTakenBy.findIndex((attackHistory) => { return attackHistory.ID == attackHistory.ID });
             if (indexOfExistData > -1) {
+                this.damageTakenBy[indexOfExistData].Damage += damage;                
             } else {
+                this.damageTakenBy.push({ID:attacker, Damage:damage});
             }
             this.startAngry(attacker);
         }        
@@ -97,6 +100,7 @@ class Monster {
     }
 
     deleteMySelft(){
+        world.eliminateMonster(this.ID,this.Location.Map);
         delete this;
     }
 
@@ -141,12 +145,8 @@ class Monster {
         this.movingTimeout = setTimeout(() => {
             let movingValue = Math.random() * 8;
             movingValue *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
-            let xAfterMove = movingValue + this.Location.CurrentPosition.x;
-            monitor.log("Current position : " + this.Location.CurrentPosition.x);
-            monitor.log("xAfterMove : " + xAfterMove + " : " + this.Location.AvailableZone.Start.x + " : "+this.Location.AvailableZone.End.x);
-            monitor.log("Moving value : " + movingValue);
-            while ((xAfterMove < this.Location.AvailableZone.Start.x) || (xAfterMove > this.Location.AvailableZone.End.x)) {
-                monitor.log("Ops.. not in my zone x__x gotta find new way");
+            let xAfterMove = movingValue + this.Location.CurrentPosition.x;            
+            while ((xAfterMove < this.Location.AvailableZone.Start.x) || (xAfterMove > this.Location.AvailableZone.End.x)) {                
                 movingValue = Math.random() * 8;
                 movingValue *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
                 xAfterMove = movingValue + this.Location.TargetPosition.x;
@@ -162,7 +162,7 @@ class Monster {
     }
 
     stopAngry() {
-        monitor.debug("[Monster] Nevermind :(")
+        monitor.debug("[Monster] Nevermind (Stop angry) :(")
         this.stopMoving();
         clearInterval(this.attackInterval);
         this.TargetPlayer = undefined;
