@@ -39,7 +39,7 @@ class MonsterController {
 
     spawnMonster(spawner){
         if (spawner.CurrentAmount < spawner.MaxAmount) {            
-            for (var i = 0; i < spawner.MaxAmount - spawner.CurrentAmount; i++) {
+            while (spawner.CurrentAmount<spawner.MaxAmount) {                        
                 let randomX = (Math.random() * (spawner.LocationSpanwer.End.x -
                     spawner.LocationSpanwer.Start.x + 1) + spawner.LocationSpanwer.Start.x);
                 let monsterData = {
