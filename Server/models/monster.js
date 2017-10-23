@@ -33,7 +33,6 @@ class Monster {
         this.attackInterval = undefined;
         this.TargetPlayer = undefined;
         this.damageTakenBy = [];
-        monitor.log("Monster SPAWNNN ");
         world.spawnMonsterToWorld(this);        
         //this.normalMoving();
         //send monsterData to client (Spawn)

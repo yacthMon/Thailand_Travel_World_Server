@@ -114,7 +114,6 @@ class World {
     }
 
     spawnMonsterToWorld(monster){
-        monitor.log("Monster SPAWNNN IN WORLD LA");
         this.remotes.forEach((remote)=>{
             if(remote.character.Location.Map == monster.Location.Map){
                 remote.send(packet.make_online_monster_spawn(monster));
