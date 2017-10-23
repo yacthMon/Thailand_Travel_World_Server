@@ -30,6 +30,7 @@ class Monster {
         this.movingInterval = undefined;
         this.attackInterval = undefined;
         this.TargetPlayer = undefined;
+        this.damageTakenBy = [];
         //this.normalMoving();
         //send monsterData to client (Spawn)
     }
@@ -72,9 +73,17 @@ class Monster {
         this.stopMoving();
         this.Status.HP -= damage > 0 ? damage : 1;
         if (this.Status.HP < 0) {
+            //monster die :(
             this.Status.HP = 0;
-        }
-        //Find target to follow
+            this.deleteMySelft();
+        } else {
+            //Find target to follow
+            monitor.debug("[Monster] got attack :(");
+            if (indexOfExistData > -1) {
+            } else {
+            }
+            this.startAngry(attacker);
+        }        
         //send to client this monster was hurt
         world.addMonsterHurtToQueue({
             ID: this.ID,
@@ -83,8 +92,12 @@ class Monster {
             Map: this.Location.Map,
             KnockbackDirection: knockback
         });
-        monitor.debug("[Monster] got attack :(");
-        this.startAngry(attacker);
+        
+        
+    }
+
+    deleteMySelft(){
+        delete this;
     }
 
     startAngry(targetID) {
