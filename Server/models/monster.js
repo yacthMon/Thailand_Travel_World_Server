@@ -20,7 +20,8 @@ class Monster {
 
             this.Location = {
                 TargetPosition: { x: 0 },
-                CurrentPosition: { x: 0, y: 0 }, //Use client physic for real
+                CurrentPosition: { x: 40, y: 0 }, //Use client physic for real
+                AvailableZone: { Start: { x: 33.18, y: 0 }, End: { x: 56.7, y: 0 } },
                 Map: "Bangkok"
             };
             this.ItemPool = [{ ItemID: 100004, Rate: 60.5 }];
@@ -127,6 +128,16 @@ class Monster {
         this.movingTimeout = setTimeout(() => {
             let movingValue = Math.random() * 8;
             movingValue *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
+            let xAfterMove = movingValue + this.Location.CurrentPosition.x;
+            monitor.log("Current position : " + this.Location.CurrentPosition.x);
+            monitor.log("xAfterMove : " + xAfterMove + " : " + this.Location.AvailableZone.Start.x + " : "+this.Location.AvailableZone.End.x);
+            monitor.log("Moving value : " + movingValue);
+            while ((xAfterMove < this.Location.AvailableZone.Start.x) || (xAfterMove > this.Location.AvailableZone.End.x)) {
+                monitor.log("Ops.. not in my zone x__x gotta find new way");
+                movingValue = Math.random() * 8;
+                movingValue *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
+                xAfterMove = movingValue + this.Location.TargetPosition.x;
+            }
             this.setTargetPosition(movingValue);
         }, ((Math.random() * 5) + 3) * 1000);
     }

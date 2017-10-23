@@ -4,7 +4,7 @@ const sampleSpawner = {
     ID: 0,
     LocationSpanwer: { Start: { x: 33.18, y: 0 }, End: { x: 56.7, y: 0 }, Map: "Way_Udon1" },
     MonsterID: 10004,
-    MaxAmount: 3,
+    MaxAmount: 1,
     CurrentAmount: 0,
     Time: 30
 }
@@ -41,14 +41,15 @@ class MonsterController {
         if (spawner.CurrentAmount < spawner.MaxAmount) {            
             while (spawner.CurrentAmount<spawner.MaxAmount) {                        
                 let randomX = (Math.random() * (spawner.LocationSpanwer.End.x -
-                    spawner.LocationSpanwer.Start.x + 1) + spawner.LocationSpanwer.Start.x);
+                    spawner.LocationSpanwer.Start.x + 1) + spawner.LocationSpanwer.Start.x);                    
                 let monsterData = {
                     ID: ++this.idGenerate,
                     monsterID: spawner.MonsterID,
                     Status: { HP: 100, MovementSpeed: 3, State: "Idle" },
                     Location: {
-                        TargetPosition: { x: 0 },
+                        TargetPosition: { x: randomX },
                         CurrentPosition: { x: randomX, y: spawner.LocationSpanwer.Start.y },
+                        AvailableZone: {Start:spawner.LocationSpanwer.Start,End:spawner.LocationSpanwer.End},
                         Map: spawner.LocationSpanwer.Map
                     },
                     ItemPool: [{ ItemID: 100004, Rate: 60.5 }]
