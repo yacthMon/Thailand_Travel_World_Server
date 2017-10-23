@@ -230,7 +230,8 @@ class RemoteProxy extends server.RemoteProxy {
   }
 
   playerChangeMap(mapName, position) {
-    world.removeRemote(this);
+    monsterController.clearMonsterAngryTo(this.userdata._id);
+    world.removeRemote(this);    
     monitor.debug("ID : " + this.userdata._id + " change map form " + this.character.Location.Map + " to " + mapName);
     this.character.Location.Map = mapName;
     this.character.Location.Position = position;

@@ -64,7 +64,7 @@ class MonsterController {
     clearMonsterAngryTo(playerID){
         this.monsterList.forEach((monster)=>{
             if(monster.TargetPlayer == playerID){
-                monitor.debug("[Monster] Player already dead.. Mission Complete !");
+                monitor.debug("[Monster] I done with you :( !");
                 monster.stopAngry();
             }
         });
