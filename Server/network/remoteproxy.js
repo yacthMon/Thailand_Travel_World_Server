@@ -165,9 +165,9 @@ class RemoteProxy extends server.RemoteProxy {
         ATK: 20,
         DEF: 5,
         Equipment: {
-          Head: 1111,
-          Body: 2222,
-          Weapon: 3333
+          Head: 0,
+          Body: 1,
+          Weapon: 1
         }
       },
       Location: {
@@ -251,10 +251,15 @@ class RemoteProxy extends server.RemoteProxy {
   }
 
   updateCharacterStatus(status) {
+    // Add other status that not exist in status parameter
     status.Gender = this.character.Status.Gender;
     status.Job = this.character.Status.Job;
     status.Equipment = this.character.Status.Equipment;
+    // Overwrite character status with status parameter
     this.character.Status = status;
+    if(status.HP <=0){// Oh no player die :(
+      monsterController.clearMonsterAngryTo(this.userdata._id);
+    }
   }
   // --------- Inventory
   addItemToInventory(itemId, amount) {

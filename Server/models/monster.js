@@ -82,10 +82,12 @@ class Monster {
             Map: this.Location.Map,
             KnockbackDirection: knockback
         });
+        monitor.debug("[Monster] got attack :(");
         this.startAngry(attacker);
     }
 
     startAngry(targetID) {
+        this.TargetPlayer = targetID;
         this.attackInterval = setInterval(() => {
             let TargetPosition = world.getPlayerPositionFromID(targetID);
             if (TargetPosition) {
@@ -136,7 +138,7 @@ class Monster {
     }
 
     stopAngry() {
-        monitor.log("Nevermind :(")
+        monitor.debug("[Monster] Nevermind :(")
         this.stopMoving();
         clearInterval(this.attackInterval);
         this.TargetPlayer = undefined;

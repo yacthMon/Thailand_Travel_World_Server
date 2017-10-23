@@ -61,9 +61,20 @@ class MonsterController {
         }
     }
 
+    clearMonsterAngryTo(playerID){
+        this.monsterList.forEach((monster)=>{
+            if(monster.TargetPlayer == playerID){
+                monitor.debug("[Monster] Player already dead.. Mission Complete !");
+                monster.stopAngry();
+            }
+        });
+    }
+
     getMonsterById(id){
         return this.monsterList.find((monster)=>{return monster.ID==id});
     }
+
+    
 }
 
 module.exports = MonsterController;
