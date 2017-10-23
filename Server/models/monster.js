@@ -25,7 +25,9 @@ class Monster {
             };
             this.ItemPool = [{ ItemID: 100004, Rate: 60.5 }];
         }
+        this.movingTimeout = undefined;
         this.movingInterval = undefined;
+        this.attackInterval = undefined;
         this.TargetPlayer = undefined;
         //this.normalMoving();
         //send monsterData to client (Spawn)
@@ -52,9 +54,7 @@ class Monster {
                 });
             } else {
                 //we reach the target
-                this.Status.State = "Idle";
-                // monitor.log("Monster state : Idle");
-                clearInterval(this.movingInterval);
+                this.stopMoving();
                 this.normalMoving();
             }
         }, 90);
@@ -64,10 +64,6 @@ class Monster {
         clearInterval(this.movingInterval);
         this.Location.TargetPosition.x += x;
         this.goToTarget();
-    }
-
-    stopMoving() {
-        clearInterval(this.movingInterval);
     }
 
     hurt(attacker, damage, knockback) {
@@ -86,14 +82,65 @@ class Monster {
             Map: this.Location.Map,
             KnockbackDirection: knockback
         });
+        this.startAngry(attacker);
+    }
+
+    startAngry(targetID) {
+        this.attackInterval = setInterval(() => {
+            let TargetPosition = world.getPlayerPositionFromID(targetID);
+            if (TargetPosition) {
+                if (findDistance(this.Location.CurrentPosition.x, TargetPosition.x)
+                    > 2) {
+                    this.Status.State = "Angry Moving";
+                    let moveValue = (findDirection(this.Location.CurrentPosition.x, TargetPosition.x)
+                        * this.Status.MovementSpeed) * (90 / 1000);
+                    this.Location.CurrentPosition.x += moveValue;
+                    //send data to temp
+                    world.addMonsterDataToQueue({
+                        ID: this.ID,
+                        HP: this.Status.HP,
+                        Map: this.Location.Map,
+                        Position: {
+                            x: this.Location.CurrentPosition.x,
+                            y: this.Location.CurrentPosition.y
+                        }
+                    });
+                } else {
+                    // //we near to the target
+                    // this.Status.State = "Attacking";                
+                    // clearInterval(this.attackInterval);
+                }
+            } else {
+                // Can't find target
+                this.stopAngry();
+            }
+        }, 90);
+    }
+
+    attack(target) {
+
     }
 
     normalMoving() {
-        setTimeout(() => {
+        this.movingTimeout = setTimeout(() => {
             let movingValue = Math.random() * 8;
             movingValue *= Math.floor(Math.random() * 2) == 1 ? 1 : -1;
             this.setTargetPosition(movingValue);
         }, ((Math.random() * 5) + 3) * 1000);
+    }
+
+    stopMoving() {
+        this.Status.State = "Idle";
+        clearInterval(this.movingInterval);
+        clearTimeout(this.movingTimeout);
+    }
+
+    stopAngry() {
+        monitor.log("Nevermind :(")
+        this.stopMoving();
+        clearInterval(this.attackInterval);
+        this.TargetPlayer = undefined;
+        this.normalMoving();
     }
 }
 

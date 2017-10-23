@@ -119,6 +119,14 @@ class World {
         return this.remotes.length;
     }
 
+    getPlayerPositionFromID(playerID){        
+        let remote = this.remotes.find((remote)=>{return remote.userdata._id==playerID});
+        if(remote){            
+            return remote.character.Location.Position;
+        }
+        return false;
+    }
+
     startQueueResponse() {
         this.responseTimer = setInterval(() => {
             if (this.countPlayer() > 0) {
@@ -162,9 +170,9 @@ class World {
                 })
                 // ---------------- AOI (Area of Interest) --------          
                 // After we done sending data we clear old data   
-                this.responsePlayerDatas.splice(0,this.responsePlayerDatas.length);
-                this.responseMonsterDatas.splice(0,this.responseMonsterDatas.length);
-                this.responseMonsterHurtDatas.splice(0,this.responseMonsterHurtDatas.length);
+                this.responsePlayerDatas.length = 0;
+                this.responseMonsterDatas.length = 0;
+                this.responseMonsterHurtDatas.length = 0;
             } else {
                 // console.log("[World] No one in this world");
             }

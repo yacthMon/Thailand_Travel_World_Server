@@ -35,7 +35,7 @@ class MonsterController {
         monitor.log("Spawner process complete !");
         monitor.log("Spawner [" + spawnerCount + "] :: Spawned [{yellow-fg}" + spawnedCount +
             "{/yellow-fg}] :: Monster spawned [{yellow-fg}" + this.monsterList.length+"{/yellow-fg}]");
-    } 
+    }
 
     spawnMonster(spawner){
         if (spawner.CurrentAmount < spawner.MaxAmount) {            
