@@ -53,18 +53,17 @@ class MonsterController {
                     },
                     ItemPool: [{ ItemID: 100004, Rate: 60.5 }]
                 };
+                spawner.CurrentAmount++;
                 let monster = new Monster(monsterData);
                 monster.normalMoving();                
                 this.monsterList.push(monster);
             }
         }
     }
-    /*
-    let spawnInterval = setInterval(()=>{
-        spawnerList.forEach((spawner)=>{
-            spawnMonster(spawner);
-        })
-    }, 60000); // Check and spawn new monster for every 1 minute*/
+
+    getMonsterById(id){
+        return this.monsterList.find((monster)=>{return monster.ID==id});
+    }
 }
 
 module.exports = MonsterController;
