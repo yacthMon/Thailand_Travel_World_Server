@@ -9,6 +9,7 @@ class Monster {
             this.Status = data.Status;
             this.Location = data.Location;
             this.ItemPool = data.ItemPool;
+            this.SpawnerID = data.SpawnerID;
         } else {
             this.ID = ID;
             this.monsterID = 10004;
@@ -25,12 +26,15 @@ class Monster {
                 Map: "Bangkok"
             };
             this.ItemPool = [{ ItemID: 100004, Rate: 60.5 }];
+            this.SpawnerID = 0;
         }
         this.movingTimeout = undefined;
         this.movingInterval = undefined;
         this.attackInterval = undefined;
         this.TargetPlayer = undefined;
         this.damageTakenBy = [];
+        monitor.log("Monster SPAWNNN ");
+        world.spawnMonsterToWorld(this);        
         //this.normalMoving();
         //send monsterData to client (Spawn)
     }
@@ -100,7 +104,7 @@ class Monster {
     }
 
     deleteMySelft(){
-        world.eliminateMonster(this.ID,this.Location.Map);
+        world.eliminateMonster(this.ID,this.Location.Map,this.SpawnerID);
         delete this;
     }
 

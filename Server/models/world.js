@@ -61,7 +61,7 @@ class World {
                 otherRemote.send(packet.make_multiplayer_connect(remote.userdata._id, remote.character));
             }
         })
-        this.monsterControl.monsterList.forEach((monster) => {
+        this.monsterControl.monsterList.forEach((monster) => { // send monster already in world
             if (monster.Location.Map === remote.character.Location.Map) {
                 monsterInWorld.push(monster);
             }
@@ -101,6 +101,27 @@ class World {
         }
     }
 
+    countPlayer() {
+        return this.remotes.length;
+    }
+
+    getPlayerPositionFromID(playerID){        
+        let remote = this.remotes.find((remote)=>{return remote.userdata._id==playerID});
+        if(remote){            
+            return remote.character.Location.Position;
+        }
+        return false;
+    }
+
+    spawnMonsterToWorld(monster){
+        monitor.log("Monster SPAWNNN IN WORLD LA");
+        this.remotes.forEach((remote)=>{
+            if(remote.character.Location.Map == monster.Location.Map){
+                remote.send(packet.make_online_monster_spawn(monster));
+            }
+        })
+    }
+
     addMonsterDataToQueue(data) {
         let indexOfExistData = this.responseMonsterDatas.findIndex((dataSet) => { return dataSet.ID == data.ID });
         if (indexOfExistData > -1) {
@@ -114,20 +135,8 @@ class World {
         this.responseMonsterHurtDatas.push(data);
     }
 
-
-    countPlayer() {
-        return this.remotes.length;
-    }
-
-    getPlayerPositionFromID(playerID){        
-        let remote = this.remotes.find((remote)=>{return remote.userdata._id==playerID});
-        if(remote){            
-            return remote.character.Location.Position;
-        }
-        return false;
-    }
-
-    eliminateMonster(id,map){
+    eliminateMonster(id,map,spawnerID){
+        this.monsterControl.decreaseMonsterInSpawnerByID(spawnerID);
         this.remotes.forEach((remote) => {
             if(remote.character.Location.Map == map){
                 remote.send(packet.make_online_monster_eliminate(id));

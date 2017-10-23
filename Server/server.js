@@ -11,7 +11,7 @@ exports.world = world;
 
 let MonsterController = require('./controllers/monsterController');
 let monsterController = new MonsterController();
-world.monsterControl = monsterController;
+world.monsterControl = monsterController; // world must delcare first and have monsterController later
 exports.monsterController = monsterController;
 
 let server = require('dgt-net').server;

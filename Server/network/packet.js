@@ -413,9 +413,13 @@ packet.make_online_monster_in_world = (monsters)=>{
   return o.buffer;
 }
 
-packet.make_online_monster_spawn = (monsters)=>{
+packet.make_online_monster_spawn = (monster)=>{
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_SPAWN);
-
+  o.append_uint32(monster.ID);
+  o.append_uint32(monster.monsterID);
+  o.append_uint32(monster.Status.HP);
+  o.append_float(monster.Location.CurrentPosition.x);
+  o.append_float(monster.Location.CurrentPosition.y);
   o.finish();
   return o.buffer;
 }

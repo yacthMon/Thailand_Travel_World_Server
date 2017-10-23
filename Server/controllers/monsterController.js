@@ -4,7 +4,7 @@ const sampleSpawner = {
     ID: 0,
     LocationSpanwer: { Start: { x: 33.18, y: 0 }, End: { x: 56.7, y: 0 }, Map: "Way_Udon1" },
     MonsterID: 10004,
-    MaxAmount: 1,
+    MaxAmount: 3,
     CurrentAmount: 0,
     Time: 30
 }
@@ -52,7 +52,8 @@ class MonsterController {
                         AvailableZone: {Start:spawner.LocationSpanwer.Start,End:spawner.LocationSpanwer.End},
                         Map: spawner.LocationSpanwer.Map
                     },
-                    ItemPool: [{ ItemID: 100004, Rate: 60.5 }]
+                    ItemPool: [{ ItemID: 100004, Rate: 60.5 }],
+                    SpawnerID : spawner.ID
                 };
                 spawner.CurrentAmount++;
                 let monster = new Monster(monsterData);
@@ -75,7 +76,13 @@ class MonsterController {
         return this.monsterList.find((monster)=>{return monster.ID==id});
     }
 
-    
+    decreaseMonsterInSpawnerByID(spawnerID){        
+        this.spawnerList.forEach((spawner)=>{
+            if(spawner.ID == spawnerID){                
+                spawner.CurrentAmount--;
+            }
+        })
+    }
 }
 
 module.exports = MonsterController;
