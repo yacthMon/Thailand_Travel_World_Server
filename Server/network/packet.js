@@ -69,8 +69,7 @@ let packet = {
   SC_ONLINE_MONSTER_IN_WORLD: 22200,
   SC_ONLINE_MONSTER_SPAWN: 22201,
   SC_ONLINE_MONSTER_CONTROL: 22202,
-  SC_ONLINE_MONSTER_HURT: 22203,
-  SC_ONLINE_MONSTER_ELIMINATE: 22204,
+  SC_ONLINE_MONSTER_ELIMINATE: 22203,
   //------- Community Part
   SC_CHAT: 22026,
   SC_NOTIFICATION: 22027,
@@ -421,7 +420,7 @@ packet.make_online_monster_spawn = (monsters)=>{
   return o.buffer;
 }
 
-packet.make_online_monster_control = (monsters)=>{
+packet.make_online_monster_control = (monsters)=>{ // not used
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_CONTROL);
   o.append_uint8(monsters.length);
   for (var i = 0; i < monsters.length; i++) {
@@ -435,9 +434,9 @@ packet.make_online_monster_control = (monsters)=>{
   return o.buffer;
 }
 
-packet.make_online_monster_eliminate = (monsters)=>{
+packet.make_online_monster_eliminate = (monsterID)=>{
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_ELIMINATE);
-
+  o.append_uint32(monsterId);
   o.finish();
   return o.buffer;
 }
