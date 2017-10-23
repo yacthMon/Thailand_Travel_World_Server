@@ -1,9 +1,9 @@
 let server = require('dgt-net').server;
-//let db = require('./database-control');
 let packet = require('./packet');
 let monitor = require('../server').monitor;
 let db = require("../server").db;
 let world = require('../server').world;
+let monsterController = require('../server').monsterController;
 let clientCount = 0;
 let account = [];
 let error = {
@@ -122,7 +122,7 @@ class RemoteProxy extends server.RemoteProxy {
   }
 
   async registerFacebookData(email, gender) {
-    db.addFacebookAccount(this.facebookId, this.facebookToken,email, gender).then((err, res) => {
+    db.addFacebookAccount(this.facebookId, this.facebookToken, email, gender).then((err, res) => {
       if (err) {
         monitor.log("Register with Facebook failed : " + err);
         this.send(packet.make_register_failed(err, error[err]));
@@ -256,32 +256,41 @@ class RemoteProxy extends server.RemoteProxy {
     status.Equipment = this.character.Status.Equipment;
     this.character.Status = status;
   }
-// --------- Inventory
-  addItemToInventory(itemId, amount){
-    this.character.Inventory.Items.push({ItemId: itemId, Amount: amount});
+  // --------- Inventory
+  addItemToInventory(itemId, amount) {
+    this.character.Inventory.Items.push({ ItemId: itemId, Amount: amount });
   }
 
-  increaseItemInventory(itemId, amount){
+  increaseItemInventory(itemId, amount) {
     let indexOfItem = this.character.Inventory.Items.findIndex((item) => { return item.ItemId == itemId });
-    if(indexOfItem > -1){
+    if (indexOfItem > -1) {
       this.character.Inventory.Items[indexOfItem].Amount += amount;
     }
   }
 
-  decreaseItemInventory(itemId, amount){
+  decreaseItemInventory(itemId, amount) {
     let indexOfItem = this.character.Inventory.Items.findIndex((item) => { return item.ItemId == itemId });
-    if(indexOfItem > -1){
+    if (indexOfItem > -1) {
       this.character.Inventory.Items[indexOfItem].Amount -= amount;
     }
   }
 
-  removeItemFromInventory(itemId, amount){
+  removeItemFromInventory(itemId, amount) {
     let indexOfItem = this.character.Inventory.Items.findIndex((item) => { return item.ItemId == itemId });
     if (indexOfItem > -1) {
-      this.character.Inventory.Items.splice(indexOfItem,1);
+      this.character.Inventory.Items.splice(indexOfItem, 1);
     }
   }
-// --------- Inventory
+  // --------- Inventory
+  // --------- Monster
+  attackMonster(IDmonster, knockback) {
+    let monster = monsterController.getMonsterById(IDmonster);
+    if (monster) {
+      monster.hurt(this.userdata._id, this.character.Status.ATK, knockback);
+    }
+  }
+  // --------- Monster
+
   chat(msg) {
     console.log('RemoteProxy chat: ' + msg)
     // world.broadcast(packet.make_chat(msg))

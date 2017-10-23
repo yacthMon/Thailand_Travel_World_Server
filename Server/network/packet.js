@@ -34,6 +34,8 @@ let packet = {
   CS_SEND_PLAYER_STATUS: 12024,
   CS_INVENTORY_ADD: 12025,
   CS_INVENTORY_INCREASE: 12026,
+  // Monster Part
+  CS_SEND_MONSTER_HURT: 12201,
   CS_CHAT: 12101,
   CS_NOTIFICATION: 12102,
 
@@ -197,6 +199,14 @@ packet[packet.CS_INVENTORY_INCREASE] = (remoteProxy, data) => {
   let amount = data.read_uint16();
   remoteProxy.increaseItemInventory(itemId, amount);
 }
+// Monster part
+// 12201
+packet[packet.CS_SEND_MONSTER_HURT] = (remoteProxy, data)=>{
+  let idMonster = data.read_uint32();
+  let knockback = data.read_int8();
+  remoteProxy.attackMonster(idMonster, knockback);
+}
+
 
 packet[packet.CS_CHAT] = function (remoteProxy, data) {
   let msg = data.read_string();
@@ -432,9 +442,9 @@ packet.make_online_monster_eliminate = (monsters)=>{
   return o.buffer;
 }
 
-packet.make_online_realtime_control = (playerDatas,monsterDatas)=>{
+packet.make_online_realtime_control = (playerDatas,monsterDatas,monsterHurtDatas)=>{
   let o = new packet_writer(packet.SC_ONLINE_REALTIME_CONTROL);
-  // player
+  // Player
   o.append_uint16(playerDatas.length); //add length first to tell client before loop
   for (let i = 0; i < playerDatas.length; i++) {
     // UID, Name, HP,SP,Job,Level,Equipment,Position only
@@ -447,13 +457,22 @@ packet.make_online_realtime_control = (playerDatas,monsterDatas)=>{
     o.append_float(playerDatas[i].ScaleX);
     o.append_int8(playerDatas[i].Animation);
   } 
-  // monster
+  // Monster Control
   o.append_uint8(monsterDatas.length);
-  for (var i = 0; i < monsterDatas.length; i++) {    
+  for (let i = 0; i < monsterDatas.length; i++) {    
     o.append_uint32(monsterDatas[i].ID);
     o.append_uint32(monsterDatas[i].HP);    
     o.append_float(monsterDatas[i].Position.x);
     o.append_float(monsterDatas[i].Position.y);
+  }
+  // Monster Hurt
+  o.append_uint8(monsterHurtDatas.length);
+  for(let i = 0; i < monsterHurtDatas.length;i++){
+    o.append_uint32(monsterHurtDatas[i].ID);
+    o.append_uint32(monsterHurtDatas[i].Damage);
+    o.append_uint32(monsterHurtDatas[i].HPLeft);
+    o.append_int8(monsterHurtDatas[i].KnockbackDirection);
+    
   }
   o.finish();
   return o.buffer;

@@ -9,8 +9,10 @@ class World {
         this.responseTimer = undefined;
         this.responsePlayerDatas = [];
         this.responseMonsterDatas = [];
+        this.responseMonsterHurtDatas = [];
         this.monsterControl = undefined;
-        /* Response data 
+        //#region Sample Data
+        /* Response data Player
         uid : user id,        
         location : position(x,y) & currentMap,
         HP : health point,
@@ -18,7 +20,21 @@ class World {
         Level : level,
         Gender: gender,
         equipment : Head & Weapon & Body
+        Respones data Monster ==========
+        ID: this.ID,
+        HP: this.Status.HP,
+        Map: this.Location.Map,
+        Position: {
+            x: this.Location.CurrentPosition.x,
+            y: this.Location.CurrentPosition.y
+        }
+        Respones data Monster Hurt =========
+        ID: this.ID,
+        Damage: damage,
+        HPLeft: this.Status.HP,
+        KnockbackDirection: findDirection(this.Location.CurrentPosition.x,attackerPositionX)        
         */
+        //#endregion Sample Data
         // static
         // characterName : character name, Job : job,
     }
@@ -33,8 +49,8 @@ class World {
                     "UID": otherRemote.userdata._id,
                     "CharacterName": character.Name,
                     "Location": character.Location,
-                    "Gender":character.Status.Gender,
-                    "Job":character.Status.Job,
+                    "Gender": character.Status.Gender,
+                    "Job": character.Status.Job,
                     "HP": character.Status.HP,
                     "SP": character.Status.SP,
                     "Job": character.Status.Job,
@@ -45,8 +61,8 @@ class World {
                 otherRemote.send(packet.make_multiplayer_connect(remote.userdata._id, remote.character));
             }
         })
-        this.monsterControl.monsterList.forEach((monster)=>{
-            if(monster.Location.Map === remote.character.Location.Map){
+        this.monsterControl.monsterList.forEach((monster) => {
+            if (monster.Location.Map === remote.character.Location.Map) {
                 monsterInWorld.push(monster);
             }
         });
@@ -85,7 +101,7 @@ class World {
         }
     }
 
-    addMonsterDataToQueue(data){
+    addMonsterDataToQueue(data) {
         let indexOfExistData = this.responseMonsterDatas.findIndex((dataSet) => { return dataSet.ID == data.ID });
         if (indexOfExistData > -1) {
             this.responseMonsterDatas.splice(indexOfExistData, 1, data);
@@ -93,6 +109,11 @@ class World {
             this.responseMonsterDatas.push(data)
         }
     }
+
+    addMonsterHurtToQueue(data) {
+        this.responseMonsterHurtDatas.push(data);
+    }
+
 
     countPlayer() {
         return this.remotes.length;
@@ -111,6 +132,7 @@ class World {
                     // let position = remote.character.Location.position; // get remote's current position;
                     let playerDataToSend = [];
                     let monsterDataToSend = [];
+                    let monsterHurtDataToSend = [];
                     this.responsePlayerDatas.forEach((otherPlayerData) => { // for All response data
                         // if (Math.abs(position.x - data.position.x) <= AOIamount) { //Check if in distance
                         //     tempDatas.push(data); // Add data that in distance to tempData;
@@ -118,26 +140,37 @@ class World {
                         // }
                         if (otherPlayerData.Map === remote.character.Location.Map) { // if otherPlayer in same map
                             playerDataToSend.push(otherPlayerData);
-                        }                        
-                    });                    
-                    
-                    this.responseMonsterDatas.forEach((monsterData)=>{
-                        if(monsterData.Map == remote.character.Location.Map){
+                        }
+                    });
+                    // Monster move data
+                    this.responseMonsterDatas.forEach((monsterData) => {
+                        if (monsterData.Map == remote.character.Location.Map) {
                             monsterDataToSend.push(monsterData);
                         }
                     });
+                    // Monster hurt data
+                    this.responseMonsterHurtDatas.forEach((monsterHurtData) => {
+                        if (monsterHurtData.Map == remote.character.Location.Map) {
+                            monsterHurtDataToSend.push(monsterHurtData);
+                        }
+                    })
                     //remote.send(packet.make_online_monster_control(monsterDataToSend));// send temp monster data to remote
                     //remote.send(packet.make_multiplayer_control(playerDataToSend)); // send temp player data to remote
-                    remote.send(packet.make_online_realtime_control(playerDataToSend,monsterDataToSend));
+                    remote.send(packet.make_online_realtime_control(playerDataToSend,
+                        monsterDataToSend,
+                        monsterHurtDataToSend));
                 })
                 // ---------------- AOI (Area of Interest) --------          
-                
+                // After we done sending data we clear old data   
+                this.responsePlayerDatas.splice(0,this.responsePlayerDatas.length);
+                this.responseMonsterDatas.splice(0,this.responseMonsterDatas.length);
+                this.responseMonsterHurtDatas.splice(0,this.responseMonsterHurtDatas.length);
             } else {
                 // console.log("[World] No one in this world");
             }
         }, this.responseTime);
 
-        
+
     }
 
     stopQueueResponse() {
