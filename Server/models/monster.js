@@ -22,8 +22,8 @@ class Monster {
                 TargetPosition: { x: 0 },
                 CurrentPosition: { x: 0, y: 0 }, //Use client physic for real
                 Map: "Bangkok"
-            };            
-            this.ItemPool = [{ItemID:100004, Rate:60.5}];
+            };
+            this.ItemPool = [{ ItemID: 100004, Rate: 60.5 }];
         }
         this.movingInterval = undefined;
         this.TargetPlayer = undefined;
@@ -70,11 +70,22 @@ class Monster {
         clearInterval(this.movingInterval);
     }
 
-    hurt(damage) {
-        damage -= this.Status.DEF;
+    hurt(attacker, damage, knockback) {
+        //damage -= this.Status.DEF;
+        this.stopMoving();
         this.Status.HP -= damage > 0 ? damage : 1;
+        if (this.Status.HP < 0) {
+            this.Status.HP = 0;
+        }
+        //Find target to follow
         //send to client this monster was hurt
-
+        world.addMonsterHurtToQueue({
+            ID: this.ID,
+            Damage: damage,
+            HPLeft: this.Status.HP,
+            Map: this.Location.Map,
+            KnockbackDirection: knockback
+        });
     }
 
     normalMoving() {
