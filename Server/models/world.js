@@ -135,7 +135,7 @@ class World {
     }
 
     eliminateMonster(id,map,spawnerID){
-        this.monsterControl.decreaseMonsterInSpawnerByID(spawnerID);
+        this.monsterControl.deleteMonsterFromList(id, spawnerID);        
         this.remotes.forEach((remote) => {
             if(remote.character.Location.Map == map){
                 remote.send(packet.make_online_monster_eliminate(id));

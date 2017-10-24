@@ -33,13 +33,14 @@ class Monster {
         this.attackInterval = undefined;
         this.TargetPlayer = undefined;
         this.damageTakenBy = [];
-        world.spawnMonsterToWorld(this);        
+        world.spawnMonsterToWorld(this);   
+        // this.startAngry(69);     
         //this.normalMoving();
         //send monsterData to client (Spawn)
     }
 
     goToTarget() {
-        this.movingInterval = setInterval(() => {
+        this.movingInterval = setInterval(() => {            
             if (findDistance(this.Location.CurrentPosition.x, this.Location.TargetPosition.x)
                 > 1) {
                 this.Status.State = "Moving";
@@ -78,10 +79,10 @@ class Monster {
         if (this.Status.HP < 0) {
             //monster die :(
             this.Status.HP = 0;
-            this.deleteMySelft();
+            this.stopAngry();
+            this.deleteMySelf();
         } else {
-            //Find target to follow
-            monitor.debug("[Monster] got attack :(");
+            //Find target to follow            
             let indexOfExistData = this.damageTakenBy.findIndex((attackHistory) => { return attackHistory.ID == attackHistory.ID });
             if (indexOfExistData > -1) {
                 this.damageTakenBy[indexOfExistData].Damage += damage;                
@@ -89,7 +90,7 @@ class Monster {
                 this.damageTakenBy.push({ID:attacker, Damage:damage});
             }
             this.startAngry(attacker);
-        }        
+        }
         //send to client this monster was hurt
         world.addMonsterHurtToQueue({
             ID: this.ID,
@@ -98,18 +99,19 @@ class Monster {
             Map: this.Location.Map,
             KnockbackDirection: knockback
         });
-        
-        
     }
 
-    deleteMySelft(){
-        world.eliminateMonster(this.ID,this.Location.Map,this.SpawnerID);
-        delete this;
+    deleteMySelf(){          
+        world.eliminateMonster(this.ID,this.Location.Map,this.SpawnerID);            
     }
-
+            
     startAngry(targetID) {
+        targetID = targetID;
         this.TargetPlayer = targetID;
-        this.attackInterval = setInterval(() => {
+        monitor.log("TargetID " + targetID);
+        clearInterval(this.attackInterval); // avoid multiple angry
+        this.attackInterval = setInterval(()=>{            
+            monitor.debug("Monster attack interval work for Monster : " + this.ID);
             let TargetPosition = world.getPlayerPositionFromID(targetID);
             if (TargetPosition) {
                 if (findDistance(this.Location.CurrentPosition.x, TargetPosition.x)
@@ -118,7 +120,7 @@ class Monster {
                     let moveValue = (findDirection(this.Location.CurrentPosition.x, TargetPosition.x)
                         * this.Status.MovementSpeed) * (90 / 1000);
                     this.Location.CurrentPosition.x += moveValue;
-                    //send data to temp
+                    //send data to temp 
                     world.addMonsterDataToQueue({
                         ID: this.ID,
                         HP: this.Status.HP,
@@ -128,13 +130,13 @@ class Monster {
                             y: this.Location.CurrentPosition.y
                         }
                     });
-                } else {
+                    } else {
                     // //we near to the target
-                    // this.Status.State = "Attacking";                
-                    // clearInterval(this.attackInterval);
+                    // this.Status.State = "Attacking";                                
                 }
             } else {
                 // Can't find target
+                monitor.debug("stop angry {not found player} by monster ["+this.ID+"]");
                 this.stopAngry();
             }
         }, 90);
@@ -159,15 +161,15 @@ class Monster {
     }
 
     stopMoving() {
-        this.Status.State = "Idle";
-        clearInterval(this.movingInterval);
+        this.Status.State = "Idle";        
+        clearInterval(this.movingInterval);        
         clearTimeout(this.movingTimeout);
     }
 
     stopAngry() {
-        monitor.debug("[Monster] Nevermind (Stop angry) :(")
-        this.stopMoving();
-        clearInterval(this.attackInterval);
+        monitor.debug("[Monster] Nevermind (Stop angry) :( from ["+this.ID +"]")        
+        clearInterval(this.attackInterval);        
+        this.stopMoving();        
         this.TargetPlayer = undefined;
         this.normalMoving();
     }

@@ -59,6 +59,7 @@ class MonsterController {
                 let monster = new Monster(monsterData);
                 monster.normalMoving();                
                 this.monsterList.push(monster);
+                monitor.log("spawn 1 monster to spawner["+ spawner.ID  + "] : " + spawner.CurrentAmount+"/"+spawner.MaxAmount);
             }
         }
     }
@@ -74,6 +75,15 @@ class MonsterController {
 
     getMonsterById(id){
         return this.monsterList.find((monster)=>{return monster.ID==id});
+    }
+
+    deleteMonsterFromList(id,spawnerID){
+        let indexOfMonster = this.monsterList.findIndex((monster)=>{return monster.ID == id});
+        if (indexOfMonster > -1) {
+            monitor.debug("Remove monster ["+id+"] from list");
+            this.decreaseMonsterInSpawnerByID(spawnerID);
+            this.monsterList.splice(indexOfMonster, 1);            
+        }
     }
 
     decreaseMonsterInSpawnerByID(spawnerID){        

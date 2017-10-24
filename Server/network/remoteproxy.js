@@ -44,6 +44,7 @@ class RemoteProxy extends server.RemoteProxy {
   onDisconnected() {
     if (this.inWorld) {
       world.removeRemote(this);
+      monsterController.clearMonsterAngryTo(this.userdata._id);
     }
     if (this.character) {
       this.updateCharacterData(this.character);
