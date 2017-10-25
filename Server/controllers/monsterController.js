@@ -1,7 +1,7 @@
 const Monster = require('../models/monster');
 let monitor = require('../server').monitor;
 const sampleSpawner = {
-    ID: 0,
+    _id: 0,
     LocationSpanwer: { Start: { x: 33.18, y: 0 }, End: { x: 56.7, y: 0 }, Map: "Way_Udon1" },
     MonsterID: 10004,
     MaxAmount: 3,
@@ -53,13 +53,13 @@ class MonsterController {
                         Map: spawner.LocationSpanwer.Map
                     },
                     ItemPool: [{ ItemID: 100004, Rate: 60.5 }],
-                    SpawnerID : spawner.ID
+                    SpawnerID : spawner._id
                 };
                 spawner.CurrentAmount++;
                 let monster = new Monster(monsterData);
                 monster.normalMoving();                
                 this.monsterList.push(monster);
-                monitor.log("spawn 1 monster to spawner["+ spawner.ID  + "] : " + spawner.CurrentAmount+"/"+spawner.MaxAmount);
+                monitor.debug("spawn 1 monster to spawner["+ spawner._id  + "] : " + spawner.CurrentAmount+"/"+spawner.MaxAmount);
             }
         }
     }
@@ -86,9 +86,9 @@ class MonsterController {
         }
     }
 
-    decreaseMonsterInSpawnerByID(spawnerID){        
+    decreaseMonsterInSpawnerByID(spawnerID){
         this.spawnerList.forEach((spawner)=>{
-            if(spawner.ID == spawnerID){                
+            if(spawner._id == spawnerID){                
                 spawner.CurrentAmount--;
             }
         })
