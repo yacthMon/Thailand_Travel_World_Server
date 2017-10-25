@@ -44,23 +44,24 @@ monitor.info("|| Log path            : " + monitor.logPath);
 monitor.info("========================================");
 db = new mongoDB(config.Database,(err) => {  
   if (!err) {
-    monitor.log("Database server connection          [{green-fg}OK{/green-fg}]");
+    monitor.log("Database server connection               [{green-fg}OK{/green-fg}]");
+    db.connect().then(()=>{
+      monitor.log("Database class connect to server         [{green-fg}OK{/green-fg}]");
+      this.monsterController.db = this.db; //set database to monsterController
+      this.monsterController.spawnMonsterToSpawnList(); // spawn monster
+    },()=>{
+      monitor.log("Database class connect to server         [{red-fg}FAILED{/red-fg}]");
+    });
   } else {
     monitor.log("Error while connect to database.");
     monitor.log(err);
-    monitor.log("Database server connection          [{red-fg}FAILED{/red-fg}]");
+    monitor.log("Database server connection               [{red-fg}FAILED{/red-fg}]");
     monitor.log("Failed to start server.");
     monitor.log("Press q or ctrl+c to exit ....");
     clearInterval(status);
     return;
   }
 });
-db.connect().then(()=>{
-  monitor.log("Database class create connect       [{green-fg}OK{/green-fg}]");
-},()=>{
-  monitor.log("Database class create connect       [{red-fg}FAILED{/red-fg}]");
-});
-monsterController.spawnMonsterToSpawnList();
 exports.db = db;
 packet = require('./network/packet');
 remoteProxy = require('./network/remoteproxy');

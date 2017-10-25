@@ -1,5 +1,6 @@
 const Monster = require('../models/monster');
 let monitor = require('../server').monitor;
+let db;
 const sampleSpawner = {
     _id: 0,
     LocationSpanwer: { Start: { x: 33.18, y: 0 }, End: { x: 56.7, y: 0 }, Map: "Way_Udon1" },
