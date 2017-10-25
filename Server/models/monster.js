@@ -6,11 +6,11 @@ class Monster {
     constructor(data) {
         if (data) {
             this.ID = data.ID;
-            this.monsterID = data.monsterID;
-            this.getMonsterData(this.mosnterID);            
+            this.monsterID = data.monsterID;            
             this.Location = data.Location;
             this.ItemPool = data.ItemPool;
             this.SpawnerID = data.SpawnerID;
+            this.getMonsterData(this.mosnterID);
         } else {
             this.ID = ID;
             this.monsterID = 10004;
@@ -33,15 +33,16 @@ class Monster {
         this.attackInterval = undefined;
         this.TargetPlayer = undefined;
         this.damageTakenBy = [];
-        this.State = "idle";
-        world.spawnMonsterToWorld(this);
+        this.State = "idle";        
         // this.startAngry(69);     
         //this.normalMoving();
         //send monsterData to client (Spawn)
     }
 
-    async getMonsterData(){
+    async getMonsterData() {
         this.Status = await db.getMonster(this.monsterID);
+        this.Status = this.Status.Status;
+        world.spawnMonsterToWorld(this);
     }
 
     goToTarget() {
@@ -52,6 +53,7 @@ class Monster {
                 // monitor.log("Monster state : Moving");
                 let moveValue = (findDirection(this.Location.CurrentPosition.x, this.Location.TargetPosition.x)
                     * this.Status.MovementSpeed) * (90 / 1000);
+                
                 this.Location.CurrentPosition.x += moveValue;
                 //send data to temp
                 world.addMonsterDataToQueue({
@@ -112,8 +114,7 @@ class Monster {
 
     startAngry(targetID) {
         targetID = targetID;
-        this.TargetPlayer = targetID;
-        monitor.log("TargetID " + targetID);
+        this.TargetPlayer = targetID;        
         clearInterval(this.attackInterval); // avoid multiple angry
         this.attackInterval = setInterval(() => {
             monitor.debug("Monster attack interval work for Monster : " + this.ID);
@@ -162,7 +163,7 @@ class Monster {
                 xAfterMove = movingValue + this.Location.TargetPosition.x;
             }
             this.setTargetPosition(movingValue);
-        }, ((Math.random() * 5) + 3) * 1000);
+        }, ((Math.random() * 3) + 3) * 1000);
     }
 
     stopMoving() {

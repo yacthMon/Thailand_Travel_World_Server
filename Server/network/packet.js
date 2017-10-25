@@ -404,10 +404,10 @@ packet.make_online_monster_in_world = (monsters)=>{
   for (var i = 0; i < monsters.length; i++) {
     let monster = monsters[i];
     o.append_uint32(monster.ID);
-    o.append_uint32(monster.monsterID);
-    o.append_uint32(monster.Status.HP);
-    o.append_float(monster.Location.CurrentPosition.x);
-    o.append_float(monster.Location.CurrentPosition.y);
+    o.append_uint32(monster.MonsterID);
+    o.append_uint32(monster.HP);    
+    o.append_float(monster.Position.x);
+    o.append_float(monster.Position.y);
   }
   o.finish();
   return o.buffer;

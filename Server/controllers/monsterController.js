@@ -41,14 +41,14 @@ class MonsterController {
         if (spawner.CurrentAmount < spawner.MaxAmount) {            
             while (spawner.CurrentAmount<spawner.MaxAmount) {                        
                 let randomX = (Math.random() * (spawner.LocationSpanwer.End.x -
-                    spawner.LocationSpanwer.Start.x + 1) + spawner.LocationSpanwer.Start.x);                    
+                    spawner.LocationSpanwer.Start.x + 1) + spawner.LocationSpanwer.Start.x);                      
                 let monsterData = {
                     ID: ++this.idGenerate,
                     monsterID: spawner.MonsterID,
                     Status: { HP: 100, MovementSpeed: 2, State: "Idle" },
                     Location: {
                         TargetPosition: { x: randomX },
-                        CurrentPosition: { x: randomX, y: spawner.LocationSpanwer.Start.y },
+                        CurrentPosition: { x: randomX , y: spawner.LocationSpanwer.Start.y },
                         AvailableZone: {Start:spawner.LocationSpanwer.Start,End:spawner.LocationSpanwer.End},
                         Map: spawner.LocationSpanwer.Map
                     },

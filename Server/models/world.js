@@ -62,8 +62,16 @@ class World {
             }
         })
         this.monsterControl.monsterList.forEach((monster) => { // send monster already in world
-            if (monster.Location.Map === remote.character.Location.Map) {
-                monsterInWorld.push(monster);
+            if (monster.Location.Map === remote.character.Location.Map) {                
+                monsterInWorld.push({
+                    ID: monster.ID,
+                    MonsterID: monster.monsterID,
+                    HP: monster.Status.HP,
+                    Position: {
+                        x: monster.Location.CurrentPosition.x,
+                        y: monster.Location.CurrentPosition.y
+                    }
+                });
             }
         });
         remote.send(packet.make_online_monster_in_world(monsterInWorld));
@@ -105,17 +113,17 @@ class World {
         return this.remotes.length;
     }
 
-    getPlayerPositionFromID(playerID){        
-        let remote = this.remotes.find((remote)=>{return remote.userdata._id==playerID});
-        if(remote){            
+    getPlayerPositionFromID(playerID) {
+        let remote = this.remotes.find((remote) => { return remote.userdata._id == playerID });
+        if (remote) {
             return remote.character.Location.Position;
         }
         return false;
     }
 
-    spawnMonsterToWorld(monster){
-        this.remotes.forEach((remote)=>{
-            if(remote.character.Location.Map == monster.Location.Map){
+    spawnMonsterToWorld(monster) {
+        this.remotes.forEach((remote) => {
+            if (remote.character.Location.Map == monster.Location.Map) {
                 remote.send(packet.make_online_monster_spawn(monster));
             }
         })
@@ -134,10 +142,10 @@ class World {
         this.responseMonsterHurtDatas.push(data);
     }
 
-    eliminateMonster(id,map,spawnerID){
-        this.monsterControl.deleteMonsterFromList(id, spawnerID);        
+    eliminateMonster(id, map, spawnerID) {
+        this.monsterControl.deleteMonsterFromList(id, spawnerID);
         this.remotes.forEach((remote) => {
-            if(remote.character.Location.Map == map){
+            if (remote.character.Location.Map == map) {
                 remote.send(packet.make_online_monster_eliminate(id));
             }
         });
