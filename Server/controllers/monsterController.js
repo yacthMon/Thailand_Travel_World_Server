@@ -1,21 +1,21 @@
 const Monster = require('../models/monster');
 let monitor = require('../server').monitor;
 let db;
-const sampleSpawner = {
-    _id: 0,
-    LocationSpanwer: { Start: { x: 33.18, y: 0 }, End: { x: 56.7, y: 0 }, Map: "Way_Udon1" },
-    MonsterID: 10004,
-    MaxAmount: 3,
-    CurrentAmount: 0,
-    Time: 30
-}
+// const sampleSpawner = {
+//     _id: 0,
+//     LocationSpanwer: { Start: { x: 33.18, y: 0 }, End: { x: 56.7, y: 0 }, Map: "Way_Udon1" },
+//     MonsterID: 10004,
+//     MaxAmount: 3,
+//     CurrentAmount: 0,
+//     Time: 30
+// }
 
 class MonsterController {
     constructor() {
         this.idGenerate = 0;
+        this.maxMonster = 0;
         this.monsterList = [];
-        this.spawnerList = [];
-        this.spawnerList.push(sampleSpawner);
+        this.spawnerList = [];        
     }
 
     async spawnMonsterToSpawnList() {
@@ -24,6 +24,7 @@ class MonsterController {
         let spawnerCount = 0, spawnedCount = 0, monsterCount = 0;
         this.spawnerList.forEach((spawner) => {
             spawnerCount++;
+            this.maxMonster += spawner.MaxAmount;
             if (spawner.CurrentAmount < spawner.MaxAmount) {
                 spawnedCount++;
                 this.spawnMonster(spawner); // first spawn Monster
@@ -93,6 +94,10 @@ class MonsterController {
             }
         })
     }
+
+    getMonsterInWorld(){
+        return this.monsterList.length;
+    }    
 }
 
 module.exports = MonsterController;

@@ -25,7 +25,8 @@ let indexRunning = 0;
 let status = setInterval(function () {
   indexRunning = ++indexRunning == 4 ? 0 : indexRunning;
   monitor.status("[" + runningCheck[indexRunning] + "] [ Thailand Travel World Server ] {red-fg}::{/red-fg} " + remoteProxy.countClient() +
-    " Clients {red-fg}::{/red-fg} " + world.countPlayer() + "  Player In world");
+    " Clients {red-fg}::{/red-fg} " + world.countPlayer() + "  Player In world {red-fg}::{/red-fg} " 
+    + monsterController.getMonsterInWorld() +"/"+monsterController.maxMonster +" Monsters");
 }, 100);
 process.title = "Thailand Travel World Server";
 monitor.info("========================================");
