@@ -9,11 +9,6 @@ world.responseTime = 100;
 world.startQueueResponse();
 exports.world = world;
 
-let MonsterController = require('./controllers/monsterController');
-let monsterController = new MonsterController();
-world.monsterControl = monsterController; // world must delcare first and have monsterController later
-exports.monsterController = monsterController;
-
 let server = require('dgt-net').server;
 let packet;// = require('./network/packet');
 let remoteProxy;// = require('./network/remoteproxy');
@@ -42,6 +37,7 @@ monitor.info("|| Server port         : " + port);
 monitor.info("|| Database Server     : " + config.Database.ip);
 monitor.info("|| Log path            : " + monitor.logPath);
 monitor.info("========================================");
+// Setting DB
 db = new mongoDB(config.Database,(err) => {  
   if (!err) {
     monitor.log("Database server connection               [{green-fg}OK{/green-fg}]");
@@ -63,6 +59,12 @@ db = new mongoDB(config.Database,(err) => {
   }
 });
 exports.db = db;
+// Setting Monster Controller
+let MonsterController = require('./controllers/monsterController');
+let monsterController = new MonsterController();
+world.monsterControl = monsterController; // world must delcare first and have monsterController later
+exports.monsterController = monsterController;
+
 packet = require('./network/packet');
 remoteProxy = require('./network/remoteproxy');
 server.setRemoteProxyClass(remoteProxy.RemoteProxy);

@@ -19,6 +19,7 @@ class MonsterController {
     }
 
     async spawnMonsterToSpawnList() {
+        Monster.db = this.db;   
         this.spawnerList = await this.db.getSpawners();
         let spawnerCount = 0, spawnedCount = 0, monsterCount = 0;
         this.spawnerList.forEach((spawner) => {

@@ -67,6 +67,15 @@ class mongoDB {
         });
     }
 
+    async getMonster(id) {
+        return new Promise((resolve, reject) => {
+            this.db.collection("Monster").findOne({ _id: id }, (err, data) => {
+                if (err) { reject(err); return; }
+                resolve(data);
+            })
+        });
+    }
+
     async addAccount(username, password, email, gender) {
         return new Promise(async (resolve, reject) => {
             if (!await this.isUsernameExist(username)) {
@@ -224,6 +233,7 @@ let doTest = async () => {
     // console.log(await dbTest.isCharacterNameExist("เทพซ่าส์"))
     // console.log(await dbTest.createCharacter(1, {"testCreate":"555", testPure : {Title : "So pure", Detail : 5555}}));
     // console.log(await dbTest.getSpawners());
+    console.log(await dbTest.getMonster(10004));
     console.log("Done Test");
 }
 dbTest.connect().then(doTest, (err) => { console.log("Error while connecting : " + err); });
