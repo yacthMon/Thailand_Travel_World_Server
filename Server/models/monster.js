@@ -43,6 +43,7 @@ class Monster {
         let monsterdata = await db.getMonster(this.monsterID);
         this.ItemDrop = monsterdata.ItemDrop;
         this.Status = monsterdata.Status;
+        this.Status.MaxHP = this.Status.HP
         this.calculateItemDrop();
         world.spawnMonsterToWorld(this);
     }
@@ -53,8 +54,7 @@ class Monster {
             if(chance<=item.Rate){
                 this.ItemPool.push(item.ItemID);
             }
-        });
-        monitor.log("Item pool for monster ["+this.ID+"] : " + this.ItemPool.toString() );
+        });        
     }
 
     goToTarget() {
@@ -93,21 +93,26 @@ class Monster {
 
     hurt(attacker, damage, knockback) {
         //damage -= this.Status.DEF;
-        this.stopMoving();
-        this.Status.HP -= damage > 0 ? damage : 1;
-        if (this.Status.HP < 0) {
+        this.stopMoving();        
+        // For avoid over damage to monster ex. 100atk but hp is 50 left > hp = -50
+        if(damage > this.Status.HP){
+            damage = this.Status.HP;
+        }
+        this.Status.HP -= damage > 0 ? damage : 1;  // check if zero damage or not
+        // Save damage     
+        let indexOfExistData = this.damageTakenBy.findIndex((attackHistory) => { return attackHistory.ID == attacker });
+        if (indexOfExistData > -1) {
+            this.damageTakenBy[indexOfExistData].Damage += damage;
+        } else {
+            monitor.log("New attacker :( !");
+            this.damageTakenBy.push({ ID: attacker, Damage: damage });
+        }
+        if (this.Status.HP <= 0) {
             //monster die :(
             this.Status.HP = 0;
             this.stopAngry();
             this.deleteMySelf();
-        } else {
-            //Find target to follow            
-            let indexOfExistData = this.damageTakenBy.findIndex((attackHistory) => { return attackHistory.ID == attackHistory.ID });
-            if (indexOfExistData > -1) {
-                this.damageTakenBy[indexOfExistData].Damage += damage;
-            } else {
-                this.damageTakenBy.push({ ID: attacker, Damage: damage });
-            }
+        } else {            
             this.startAngry(attacker);
         }
         //send to client this monster was hurt
@@ -121,6 +126,10 @@ class Monster {
     }
 
     deleteMySelf() {
+        this.damageTakenBy.forEach((attacker)=>{
+            let damagePercent = (attacker.Damage/this.Status.MaxHP) * 100;
+            monitor.log("Attacked by " + attacker.ID + " Damage : " + damagePercent + "%");
+        })
         world.eliminateMonster(this.ID, this.Location.Map, this.SpawnerID, this.ItemPool);
     }
 
