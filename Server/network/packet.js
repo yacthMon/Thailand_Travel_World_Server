@@ -422,6 +422,8 @@ packet.make_online_monster_spawn = (monster)=>{
   o.append_uint32(monster.Status.HP);
   o.append_float(monster.Location.CurrentPosition.x);
   o.append_float(monster.Location.CurrentPosition.y);
+  o.append_float(monster.Location.TargetPosition.x);
+  o.append_float(monster.Location.TargetPosition.y);
   o.finish();
   return o.buffer;
 }
