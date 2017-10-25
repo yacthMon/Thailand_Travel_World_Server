@@ -408,6 +408,8 @@ packet.make_online_monster_in_world = (monsters)=>{
     o.append_uint32(monster.HP);    
     o.append_float(monster.Position.x);
     o.append_float(monster.Position.y);
+    o.append_float(monster.TargetPosition.x);
+    o.append_float(monster.TargetPosition.y);
   }
   o.finish();
   return o.buffer;

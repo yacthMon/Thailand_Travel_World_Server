@@ -70,7 +70,12 @@ class World {
                     Position: {
                         x: monster.Location.CurrentPosition.x,
                         y: monster.Location.CurrentPosition.y
+                    },
+                    TargetPosition: {
+                        x: monster.Location.TargetPosition.x,
+                        y: monster.Location.TargetPosition.y
                     }
+
                 });
             }
         });
