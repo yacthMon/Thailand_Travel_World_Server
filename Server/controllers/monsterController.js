@@ -53,7 +53,6 @@ class MonsterController {
                         AvailableZone: {Start:spawner.LocationSpanwer.Start,End:spawner.LocationSpanwer.End},
                         Map: spawner.LocationSpanwer.Map
                     },
-                    ItemPool: [{ ItemID: 100004, Rate: 60.5 }],
                     SpawnerID : spawner._id
                 };
                 spawner.CurrentAmount++;

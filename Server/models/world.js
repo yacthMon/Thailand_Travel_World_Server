@@ -142,11 +142,11 @@ class World {
         this.responseMonsterHurtDatas.push(data);
     }
 
-    eliminateMonster(id, map, spawnerID) {
+    eliminateMonster(id, map, spawnerID, itemPool) {
         this.monsterControl.deleteMonsterFromList(id, spawnerID);
         this.remotes.forEach((remote) => {
             if (remote.character.Location.Map == map) {
-                remote.send(packet.make_online_monster_eliminate(id));
+                remote.send(packet.make_online_monster_eliminate(id,itemPool));
             }
         });
     }

@@ -7,8 +7,7 @@ class Monster {
         if (data) {
             this.ID = data.ID;
             this.monsterID = data.monsterID;            
-            this.Location = data.Location;
-            this.ItemPool = data.ItemPool;
+            this.Location = data.Location;            
             this.SpawnerID = data.SpawnerID;
             this.getMonsterData(this.mosnterID);
         } else {
@@ -25,7 +24,7 @@ class Monster {
                 AvailableZone: { Start: { x: 33.18, y: 0 }, End: { x: 56.7, y: 0 } },
                 Map: "Bangkok"
             };
-            this.ItemPool = [{ ItemID: 100004, Rate: 60.5 }];
+            this.ItemDrop = [{ ItemID: 100004, Rate: 60.5 }];            
             this.SpawnerID = 0;
         }
         this.movingTimeout = undefined;
@@ -33,6 +32,7 @@ class Monster {
         this.attackInterval = undefined;
         this.TargetPlayer = undefined;
         this.damageTakenBy = [];
+        this.ItemPool = [];
         this.State = "idle";        
         // this.startAngry(69);     
         //this.normalMoving();
@@ -40,9 +40,21 @@ class Monster {
     }
 
     async getMonsterData() {
-        this.Status = await db.getMonster(this.monsterID);
-        this.Status = this.Status.Status;
+        let monsterdata = await db.getMonster(this.monsterID);
+        this.ItemDrop = monsterdata.ItemDrop;
+        this.Status = monsterdata.Status;
+        this.calculateItemDrop();
         world.spawnMonsterToWorld(this);
+    }
+
+    calculateItemDrop(){        
+        this.ItemDrop.forEach((item)=>{
+            let chance = (Math.random())*100;
+            if(chance<=item.Rate){
+                this.ItemPool.push(item.ItemID);
+            }
+        });
+        monitor.log("Item pool for monster ["+this.ID+"] : " + this.ItemPool.toString() );
     }
 
     goToTarget() {
@@ -109,7 +121,7 @@ class Monster {
     }
 
     deleteMySelf() {
-        world.eliminateMonster(this.ID, this.Location.Map, this.SpawnerID);
+        world.eliminateMonster(this.ID, this.Location.Map, this.SpawnerID, this.ItemPool);
     }
 
     startAngry(targetID) {

@@ -33,7 +33,7 @@ monitor.info("========================================");
 monitor.info("|| King Mongkut University of Technology Thonburi");
 monitor.info("|| Thailand Travel World server  ");
 monitor.info("|| Server Side         : v" + package.version);
-monitor.info("|| NodeJS version      : " + process.version);
+monitor.info("|| Node.JS version     : " + process.version);
 monitor.info("|| Server port         : " + port);
 monitor.info("|| Database Server     : " + config.Database.ip);
 monitor.info("|| Log path            : " + monitor.logPath);
