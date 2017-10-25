@@ -18,10 +18,8 @@ class MonsterController {
         this.spawnerList.push(sampleSpawner);
     }
 
-    spawnMonsterToSpawnList() {
-        //check if already full monster for this spawner yet ?
-        // let monster = new Monster();
-        // this.monsterList.push(monster);
+    async spawnMonsterToSpawnList() {
+        this.spawnerList = await this.db.getSpawners();
         let spawnerCount = 0, spawnedCount = 0, monsterCount = 0;
         this.spawnerList.forEach((spawner) => {
             spawnerCount++;
@@ -34,7 +32,7 @@ class MonsterController {
             }
         });
         monitor.log("Spawner process complete !");
-        monitor.log("Spawner [" + spawnerCount + "] :: Spawned [{yellow-fg}" + spawnedCount +
+        monitor.log("Spawners [" + spawnerCount + "] :: Spawned [{yellow-fg}" + spawnedCount +
             "{/yellow-fg}] :: Monster spawned [{yellow-fg}" + this.monsterList.length+"{/yellow-fg}]");
     }
 
@@ -46,7 +44,7 @@ class MonsterController {
                 let monsterData = {
                     ID: ++this.idGenerate,
                     monsterID: spawner.MonsterID,
-                    Status: { HP: 100, MovementSpeed: 3, State: "Idle" },
+                    Status: { HP: 100, MovementSpeed: 2, State: "Idle" },
                     Location: {
                         TargetPosition: { x: randomX },
                         CurrentPosition: { x: randomX, y: spawner.LocationSpanwer.Start.y },

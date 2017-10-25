@@ -15,7 +15,7 @@ class Monster {
             this.monsterID = 10004;
             this.Status = {
                 HP: 100,
-                MovementSpeed: 3,
+                MovementSpeed: 2,
                 State: "Idle"
             }
 
