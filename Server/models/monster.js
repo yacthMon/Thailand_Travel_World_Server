@@ -105,7 +105,6 @@ class Monster {
         if (indexOfExistData > -1) {
             this.damageTakenBy[indexOfExistData].Damage += damage;
         } else {
-            monitor.log("New attacker :( !");
             this.damageTakenBy.push({ ID: attacker, Damage: damage });
         }
         if (this.Status.HP <= 0) {
@@ -144,7 +143,6 @@ class Monster {
             if (targetPosition) {                
                 if (findDistance(this.Location.CurrentPosition.x, targetPosition.x)
                     > 2) {
-                        monitor.log("Start move ?");
                     this.State = "Angry Moving";
                     let moveValue = (findDirection(this.Location.CurrentPosition.x, targetPosition.x)
                         * this.Status.MovementSpeed) * (90 / 1000);
@@ -163,9 +161,9 @@ class Monster {
                     // //we near to the target
                     this.State = "Attacking";   
                     this.attack(targetPosition);         
-                    monitor.log("Position current : " + JSON.stringify(this.Location.CurrentPosition));
-                    monitor.log("Position target  : " + JSON.stringify(targetPosition));
-                    monitor.log("Let attack distance : " + findDistance(this.Location.CurrentPosition.x, targetPosition.x));                    
+                    // monitor.log("Position current : " + JSON.stringify(this.Location.CurrentPosition));
+                    // monitor.log("Position target  : " + JSON.stringify(targetPosition));
+                    // monitor.log("Let attack distance : " + findDistance(this.Location.CurrentPosition.x, targetPosition.x));                    
                 }
             } else {
                 // Can't find target
@@ -175,8 +173,7 @@ class Monster {
         }, 90);
     }
 
-    attack(position) {
-        monitor.log("Stop angry");
+    attack(position) {        
         clearInterval(this.angryInterval);
         clearInterval(this.attackInterval); // avoid multiple attack
         let direction = findDirection(this.Location.CurrentPosition.x, position.x);
@@ -188,8 +185,8 @@ class Monster {
                 this.State = "Attacking";                
                 let moveValue = ((findDirection(this.Location.CurrentPosition.x, positionToGo)
                 * this.Status.MovementSpeed) * (90 / 1000)); // move more faster
-                monitor.log("Attacking direct : "+(direction * 5));
-                monitor.log("attack move value : " + moveValue);
+                // monitor.log("Attacking direct : "+(direction * 5));
+                // monitor.log("attack move value : " + moveValue);
                 this.Location.CurrentPosition.x += moveValue;                
                 //send data to temp 
                 world.addMonsterDataToQueue({
@@ -202,8 +199,7 @@ class Monster {
                     }
                 });
             } else {                
-                // done attack stop attacking and startAngry again
-                monitor.log("Done attacked ");
+                // done attack stop attacking and startAngry again                
                 clearInterval(this.attackInterval);
                 this.startAngry(this.TargetPlayer);
             }
