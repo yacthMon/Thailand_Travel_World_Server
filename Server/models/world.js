@@ -147,11 +147,16 @@ class World {
         this.responseMonsterHurtDatas.push(data);
     }
 
-    eliminateMonster(id, map, spawnerID, itemPool) {
-        this.monsterControl.deleteMonsterFromList(id, spawnerID);
+    eliminateMonster(monster) {
+        this.monsterControl.deleteMonsterFromList(monster.ID, monster.SpawnerID);
         this.remotes.forEach((remote) => {
-            if (remote.character.Location.Map == map) {
-                remote.send(packet.make_online_monster_eliminate(id,itemPool));
+            if (remote.character.Location.Map == monster.Location.Map) {
+                remote.send(packet.make_online_monster_eliminate(monster.ID,monster.ItemPool));
+                // find attack data for if this remote attack this monster
+                let attacking = monster.attackers.find((attacker)=>{return attacker.ID == remote.userdata._id})
+                if(attacking){
+                    remote.send(packet.make_online_monster_reward(monster.monsterID,attacking));
+                }
             }
         });
     }
