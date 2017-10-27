@@ -136,7 +136,7 @@ class Monster {
             let damagePercent = (attacker.Damage / this.Status.MaxHP);
             let expReceive = damagePercent * this.Status.EXP;
             attacker.EXPReceive = expReceive;
-            monitor.log("Attacked by " + attacker.ID + " Damage : " + attacker.Damage + " (" + (damagePercent * 100) + "%) EXP Gain : " + expReceive);
+            monitor.debug("Attacked by " + attacker.ID + " Damage : " + attacker.Damage + " (" + (damagePercent * 100) + "%) EXP Gain : " + expReceive);
         })
         world.eliminateMonster(this);
         //        world.eliminateMonster(this.ID, this.Location.Map, this.SpawnerID, this.ItemPool, this.attackers);
@@ -147,7 +147,7 @@ class Monster {
         this.TargetPlayer = targetID;
         clearInterval(this.angryInterval); // avoid multiple angry
         this.angryInterval = setInterval(() => {
-            monitor.debug("Monster attack interval work for Monster : " + this.ID + " State : " + this.State);
+            // monitor.debug("Monster attack interval work for Monster : " + this.ID + " State : " + this.State);
             let targetPosition = world.getPlayerPositionFromID(targetID);
             if (targetPosition) {
                 if (findDistance(this.Location.CurrentPosition.x, targetPosition.x)
@@ -171,9 +171,7 @@ class Monster {
                     this.State = "Attacking";
                     clearInterval(this.angryInterval);
                     this.attack(targetPosition);
-                    // monitor.log("Position current : " + JSON.stringify(this.Location.CurrentPosition));
-                    // monitor.log("Position target  : " + JSON.stringify(targetPosition));
-                    // monitor.log("Let attack distance : " + findDistance(this.Location.CurrentPosition.x, targetPosition.x));
+                    
                 }
             } else {
                 // Can't find target
@@ -184,24 +182,17 @@ class Monster {
     }
 
     attack(position) {        
-        clearInterval(this.attackInterval); // avoid multiple attack
-        // let round = 0;
+        clearInterval(this.attackInterval); // avoid multiple attack        
         let direction = findDirection(this.Location.CurrentPosition.x, position.x);
         // attack type move toward target
-        let positionToGo = position.x + (direction * 5);
-        // monitor.log("Init attack position to go : " + positionToGo);
+        let positionToGo = position.x + (direction * 5);        
         this.attackInterval = setInterval(() => {
             if (findDistance(this.Location.CurrentPosition.x, positionToGo)
-                > 0.1) {
-                // monitor.log("[" + round++ + "]Start attacking Position to go : " + positionToGo);
+                > 0.1) {                
                 this.State = "Attacking";
                 let moveValue = ((findDirection(this.Location.CurrentPosition.x, positionToGo)
-                    * this.Status.MovementSpeed) * (90 / 1000));
-                // monitor.log("Current Position =: " + this.Location.CurrentPosition.x);
-                // monitor.log("Attacking direct  : " + (direction * 5));
-                // monitor.log("attack move value : " + moveValue);                
-                this.Location.CurrentPosition.x += moveValue;
-                // monitor.log("== result ======  : " + this.Location.CurrentPosition.x);
+                    * this.Status.MovementSpeed) * (90 / 1000)) ;        
+                this.Location.CurrentPosition.x += moveValue;                
                 //send data to temp 
                 world.addMonsterDataToQueue({
                     ID: this.ID,
@@ -211,11 +202,9 @@ class Monster {
                         x: this.Location.CurrentPosition.x,
                         y: this.Location.CurrentPosition.y
                     }
-                });
-                monitor.log("End of attacking");
+                });                
             } else {
                 // done attack stop attacking and startAngry again                
-                monitor.log("Done Attack")
                 clearInterval(this.attackInterval);
                 this.startAngry(this.TargetPlayer);
             }
