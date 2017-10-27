@@ -96,6 +96,8 @@ class Monster {
     hurt(attacker, damage, knockback) {
         //damage -= this.Status.DEF;
         this.stopMoving();
+        clearInterval(this.angryInterval);
+        clearInterval(this.attackInterval);
         // For avoid over damage to monster ex. 100atk but hp is 50 left > hp = -50
         if (damage > this.Status.HP) {
             damage = this.Status.HP;
@@ -107,7 +109,7 @@ class Monster {
             this.attackers[indexOfAttacker].Damage += damage;
         } else {
             indexOfAttacker = this.attackers.length;
-            this.attackers.push({ ID: attacker, Damage: damage, Killer:false });
+            this.attackers.push({ ID: attacker, Damage: damage, Killer: false });
         }
         if (this.Status.HP <= 0) {
             //monster die :(            
@@ -132,12 +134,12 @@ class Monster {
     deleteMySelf() {
         this.attackers.forEach((attacker) => {
             let damagePercent = (attacker.Damage / this.Status.MaxHP);
-            let expReceive = damagePercent*this.Status.EXP;
+            let expReceive = damagePercent * this.Status.EXP;
             attacker.EXPReceive = expReceive;
-            monitor.log("Attacked by " + attacker.ID + " Damage : " + attacker.Damage +" (" + (damagePercent * 100) + "%) EXP Gain : " + expReceive);
+            monitor.log("Attacked by " + attacker.ID + " Damage : " + attacker.Damage + " (" + (damagePercent * 100) + "%) EXP Gain : " + expReceive);
         })
         world.eliminateMonster(this);
-//        world.eliminateMonster(this.ID, this.Location.Map, this.SpawnerID, this.ItemPool, this.attackers);
+        //        world.eliminateMonster(this.ID, this.Location.Map, this.SpawnerID, this.ItemPool, this.attackers);
     }
 
     startAngry(targetID) {
@@ -145,7 +147,7 @@ class Monster {
         this.TargetPlayer = targetID;
         clearInterval(this.angryInterval); // avoid multiple angry
         this.angryInterval = setInterval(() => {
-            monitor.debug("Monster attack interval work for Monster : " + this.ID);
+            monitor.debug("Monster attack interval work for Monster : " + this.ID + " State : " + this.State);
             let targetPosition = world.getPlayerPositionFromID(targetID);
             if (targetPosition) {
                 if (findDistance(this.Location.CurrentPosition.x, targetPosition.x)
@@ -167,10 +169,11 @@ class Monster {
                 } else {
                     // //we near to the target
                     this.State = "Attacking";
+                    clearInterval(this.angryInterval);
                     this.attack(targetPosition);
                     // monitor.log("Position current : " + JSON.stringify(this.Location.CurrentPosition));
                     // monitor.log("Position target  : " + JSON.stringify(targetPosition));
-                    // monitor.log("Let attack distance : " + findDistance(this.Location.CurrentPosition.x, targetPosition.x));                    
+                    // monitor.log("Let attack distance : " + findDistance(this.Location.CurrentPosition.x, targetPosition.x));
                 }
             } else {
                 // Can't find target
@@ -180,21 +183,25 @@ class Monster {
         }, 90);
     }
 
-    attack(position) {
-        clearInterval(this.angryInterval);
+    attack(position) {        
         clearInterval(this.attackInterval); // avoid multiple attack
+        // let round = 0;
         let direction = findDirection(this.Location.CurrentPosition.x, position.x);
         // attack type move toward target
         let positionToGo = position.x + (direction * 5);
+        // monitor.log("Init attack position to go : " + positionToGo);
         this.attackInterval = setInterval(() => {
             if (findDistance(this.Location.CurrentPosition.x, positionToGo)
-                > 1) {
+                > 0.1) {
+                // monitor.log("[" + round++ + "]Start attacking Position to go : " + positionToGo);
                 this.State = "Attacking";
                 let moveValue = ((findDirection(this.Location.CurrentPosition.x, positionToGo)
-                    * this.Status.MovementSpeed) * (90 / 1000)); // move more faster
-                // monitor.log("Attacking direct : "+(direction * 5));
-                // monitor.log("attack move value : " + moveValue);
+                    * this.Status.MovementSpeed) * (90 / 1000));
+                // monitor.log("Current Position =: " + this.Location.CurrentPosition.x);
+                // monitor.log("Attacking direct  : " + (direction * 5));
+                // monitor.log("attack move value : " + moveValue);                
                 this.Location.CurrentPosition.x += moveValue;
+                // monitor.log("== result ======  : " + this.Location.CurrentPosition.x);
                 //send data to temp 
                 world.addMonsterDataToQueue({
                     ID: this.ID,
@@ -205,8 +212,10 @@ class Monster {
                         y: this.Location.CurrentPosition.y
                     }
                 });
+                monitor.log("End of attacking");
             } else {
                 // done attack stop attacking and startAngry again                
+                monitor.log("Done Attack")
                 clearInterval(this.attackInterval);
                 this.startAngry(this.TargetPlayer);
             }
