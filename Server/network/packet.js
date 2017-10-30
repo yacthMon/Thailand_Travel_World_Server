@@ -34,6 +34,8 @@ let packet = {
   CS_SEND_PLAYER_STATUS: 12024,
   CS_INVENTORY_ADD: 12025,
   CS_INVENTORY_INCREASE: 12026,
+  CS_INVENTORY_DECREASE: 12027,
+  CS_INVENTORY_REMOVE: 12028,
   // Monster Part
   CS_SEND_MONSTER_HURT: 12201,
   CS_CHAT: 12101,
@@ -199,6 +201,18 @@ packet[packet.CS_INVENTORY_INCREASE] = (remoteProxy, data) => {
   let amount = data.read_uint16();
   remoteProxy.increaseItemInventory(itemId, amount);
 }
+
+packet[packet.CS_INVENTORY_DECREASE] = (remoteProxy, data) => {
+  let itemId = data.read_uint32();
+  let amount = data.read_uint16();
+  remoteProxy.decreaseItemInventory(itemId, amount);
+}
+
+packet[packet.CS_INVENTORY_REMOVE] = (remoteProxy, data) => {
+  let itemId = data.read_uint32();  
+  remoteProxy.removeItemFromInventory(itemId);
+}
+
 // Monster part
 // 12201
 packet[packet.CS_SEND_MONSTER_HURT] = (remoteProxy, data) => {

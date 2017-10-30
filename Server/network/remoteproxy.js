@@ -282,7 +282,7 @@ class RemoteProxy extends server.RemoteProxy {
     }
   }
 
-  removeItemFromInventory(itemId, amount) {
+  removeItemFromInventory(itemId) {
     let indexOfItem = this.character.Inventory.Items.findIndex((item) => { return item.ItemId == itemId });
     if (indexOfItem > -1) {
       this.character.Inventory.Items.splice(indexOfItem, 1);
