@@ -34,6 +34,8 @@ let packet = {
   CS_SEND_PLAYER_STATUS: 12024,
   CS_INVENTORY_ADD: 12025,
   CS_INVENTORY_INCREASE: 12026,
+  // Monster Part
+  CS_SEND_MONSTER_HURT: 12201,
   CS_CHAT: 12101,
   CS_NOTIFICATION: 12102,
 
@@ -56,12 +58,20 @@ let packet = {
   SC_CHARACTER_CREATE_FAILED: 21018,
   SC_FACEBOOK_REQUEST_REGISTER: 21019,
   /* 22xxx for Online Realtime*/
+  SC_ONLINE_REALTIME_CONTROL: 22000,
   SC_MULTIPLAYER_PLAYERS_IN_WORLD: 22020,
   SC_MULTIPLAYER_ENTER_WORLD_GRANT: 22021,
   SC_MULTIPLAYER_ENTER_WORLD_DENIED: 22022,
   SC_ONLINE_PLAYER_CONNECT: 22023,
   SC_ONLINE_PLAYER_CONTROL: 22024,
   SC_ONLINE_PLAYER_DISCONNECT: 22025,
+  //------- Monster Part
+  SC_ONLINE_MONSTER_IN_WORLD: 22200,
+  SC_ONLINE_MONSTER_SPAWN: 22201,
+  SC_ONLINE_MONSTER_CONTROL: 22202,
+  SC_ONLINE_MONSTER_ELIMINATE: 22203,
+  SC_ONLINE_MONSTER_REWARD: 22204,
+  //------- Community Part
   SC_CHAT: 22026,
   SC_NOTIFICATION: 22027,
 };
@@ -96,9 +106,9 @@ packet[packet.CS_AUTHENTICATION] = function (remoteProxy, data) {
   remoteProxy.authentication(username, password);
 }
 
-packet[packet.CS_CHECK_CHARACTER_NAME] = function(remoteProxy,data){
+packet[packet.CS_CHECK_CHARACTER_NAME] = function (remoteProxy, data) {
   let characterName = data.read_string();
-  if (!data.completed()) return true; 
+  if (!data.completed()) return true;
   remoteProxy.checkCharacterName(characterName);
 }
 
@@ -110,26 +120,26 @@ packet[packet.CS_UPDATE_ACCOUNTDATA] = function (remoteProxy, data) {
   remoteProxy.updateAccountData(color, highest_level, highest_checkpoint);
 }
 
-packet[packet.CS_CREATE_CHARACTER] = function(remoteProxy,data){
+packet[packet.CS_CREATE_CHARACTER] = function (remoteProxy, data) {
   let name = data.read_string();
   let gender = data.read_string();
   let job = data.read_string();
-  if(!data.completed()) return true;
-  remoteProxy.createCharacter(name,gender,job);
+  if (!data.completed()) return true;
+  remoteProxy.createCharacter(name, gender, job);
 }
 
 packet[packet.CS_AUTHENTICATION_WITH_FACEBOOK] = function (remoteProxy, data) {
   let fbid = data.read_string();
   let token = data.read_string();
   if (!data.completed()) return true;
-  remoteProxy.authenticationWithFacebook(fbid,token);
+  remoteProxy.authenticationWithFacebook(fbid, token);
 }
 
-packet[packet.CS_REGISTER_FACEBOOK_DATA] = function(remoteProxy,data){
+packet[packet.CS_REGISTER_FACEBOOK_DATA] = function (remoteProxy, data) {
   let email = data.read_string();
   let gender = data.read_string();
-  if(!data.completed()) return true;
-  remoteProxy.registerFacebookData(email,gender);
+  if (!data.completed()) return true;
+  remoteProxy.registerFacebookData(email, gender);
 }
 
 packet[packet.CS_SEND_PLAYER_MOVING] = function (remoteProxy, data) {
@@ -146,22 +156,22 @@ packet[packet.CS_SEND_PLAYER_MOVING] = function (remoteProxy, data) {
 }
 
 packet[packet.CS_REQUEST_ENTER_WORLD] = function (remoteProxy, data) {
-  let characterName = data.read_string();  
+  let characterName = data.read_string();
   if (!data.completed()) return true;
   remoteProxy.playerEnterWorld(characterName);
 }
 
 packet[packet.CS_PLAYER_CHANGE_MAP] = function (remoteProxy, data) {
-  let mapName = data.read_string();  
-  let position = {x:data.read_float(),y:data.read_float()};
+  let mapName = data.read_string();
+  let position = { x: data.read_float(), y: data.read_float() };
   if (!data.completed()) return true;
-  remoteProxy.playerChangeMap(mapName,position);
+  remoteProxy.playerChangeMap(mapName, position);
 }
 
 packet[packet.CS_SEND_PLAYER_STATUS] = function (remoteProxy, data) {
   let status = {
     Level: data.read_uint8(),
-    EXP : data.read_uint16(),
+    EXP: data.read_uint16(),
     MaxEXP: data.read_uint16(),
     HP: data.read_uint16(),
     MaxHP: data.read_uint16(),
@@ -189,6 +199,14 @@ packet[packet.CS_INVENTORY_INCREASE] = (remoteProxy, data) => {
   let amount = data.read_uint16();
   remoteProxy.increaseItemInventory(itemId, amount);
 }
+// Monster part
+// 12201
+packet[packet.CS_SEND_MONSTER_HURT] = (remoteProxy, data) => {
+  let idMonster = data.read_uint32();
+  let knockback = data.read_int8();
+  remoteProxy.attackMonster(idMonster, knockback);
+}
+
 
 packet[packet.CS_CHAT] = function (remoteProxy, data) {
   let msg = data.read_string();
@@ -268,7 +286,7 @@ packet.make_account_data = (data) => {
     o.append_int8(data.Characters.length); // Length of Character
     for (let i = 0; i < data.Characters.length; i++) { // Append data for each character      
       let character = data.Characters[i];
-      o = convertCharacterDataToPacketData(o,character);
+      o = convertCharacterDataToPacketData(o, character);
     }
   } else {
     o.append_int8(0); // don't have any Character
@@ -277,39 +295,39 @@ packet.make_account_data = (data) => {
   return o.buffer;
 }
 
-packet.make_character_name_available = ()=>{
-  let o =new packet_writer(packet.SC_CHARACTER_NAME_AVAILABLE);
+packet.make_character_name_available = () => {
+  let o = new packet_writer(packet.SC_CHARACTER_NAME_AVAILABLE);
   o.finish();
-  return o.buffer; 
+  return o.buffer;
 }
 
-packet.make_character_name_already_used = function(){
+packet.make_character_name_already_used = function () {
   let o = new packet_writer(packet.SC_CHARACTER_NAME_ALREADY_USED);
   o.finish();
   return o.buffer;
 }
 
-packet.make_character_create_success = function(character){
-  let o =new packet_writer(packet.SC_CHARACTER_CREATE_SUCCESS);
+packet.make_character_create_success = function (character) {
+  let o = new packet_writer(packet.SC_CHARACTER_CREATE_SUCCESS);
   o = convertCharacterDataToPacketData(o, character);
   o.finish();
   return o.buffer;
 }
 
-packet.make_character_create_failed = function(){
-  let o =new packet_writer(packet.SC_CHARACTER_CREATE_FAILED);
+packet.make_character_create_failed = function () {
+  let o = new packet_writer(packet.SC_CHARACTER_CREATE_FAILED);
   o.finish();
   return o.buffer;
 }
 
-packet.make_multiplayer_enter_world_grant = function(){
-  let o =new packet_writer(packet.SC_MULTIPLAYER_ENTER_WORLD_GRANT);
+packet.make_multiplayer_enter_world_grant = function () {
+  let o = new packet_writer(packet.SC_MULTIPLAYER_ENTER_WORLD_GRANT);
   o.finish();
   return o.buffer;
 }
 
-packet.make_multiplayer_enter_world_denied = function(){
-  let o =new packet_writer(packet.SC_MULTIPLAYER_ENTER_WORLD_DENIED);
+packet.make_multiplayer_enter_world_denied = function () {
+  let o = new packet_writer(packet.SC_MULTIPLAYER_ENTER_WORLD_DENIED);
   o.finish();
   return o.buffer;
 }
@@ -324,7 +342,7 @@ packet.make_multiplayer_connect = function (uid, character) {
   o.append_string(character.Status.Gender);
   o.append_string(character.Status.Job);
   o.append_uint32(character.Status.HP);
-  o.append_uint32(character.Status.SP);  
+  o.append_uint32(character.Status.SP);
   o.append_uint32(character.Status.Level);
   o.append_uint32(character.Status.Equipment.Head);
   o.append_uint32(character.Status.Equipment.Body);
@@ -346,7 +364,7 @@ packet.make_multiplayer_control = function (datas) {
     o.append_float(datas[i].Velocity.y);
     o.append_float(datas[i].ScaleX);
     o.append_int8(datas[i].Animation);
-  } 
+  }
   o.finish(); //[Bug(5)]ทำงานก่อนที่ for จะเสร็จ ??
   return o.buffer;
 }
@@ -380,7 +398,109 @@ packet.make_multiplayer_disconnect = function (uid) {
   o.finish();
   return o.buffer;
 }
+//------------ Monster Part
+packet.make_online_monster_in_world = (monsters) => {
+  let o = new packet_writer(packet.SC_ONLINE_MONSTER_IN_WORLD);
+  o.append_uint8(monsters.length);
+  for (var i = 0; i < monsters.length; i++) {
+    let monster = monsters[i];
+    o.append_uint32(monster.ID);
+    o.append_uint32(monster.MonsterID);
+    o.append_uint32(monster.HP);
+    o.append_float(monster.Position.x);
+    o.append_float(monster.Position.y);
+    o.append_float(monster.TargetPosition.x);
+    o.append_float(monster.TargetPosition.y);
+  }
+  o.finish();
+  return o.buffer;
+}
 
+packet.make_online_monster_spawn = (monster) => {
+  let o = new packet_writer(packet.SC_ONLINE_MONSTER_SPAWN);
+  o.append_uint32(monster.ID);
+  o.append_uint32(monster.monsterID);
+  o.append_uint32(monster.Status.HP);
+  o.append_float(monster.Location.CurrentPosition.x);
+  o.append_float(monster.Location.CurrentPosition.y);
+  o.append_float(monster.Location.TargetPosition.x);
+  o.append_float(monster.Location.TargetPosition.y);
+  o.finish();
+  return o.buffer;
+}
+
+packet.make_online_monster_control = (monsters) => { // not used
+  let o = new packet_writer(packet.SC_ONLINE_MONSTER_CONTROL);
+  o.append_uint8(monsters.length);
+  for (var i = 0; i < monsters.length; i++) {
+    let monster = monsters[i];
+    o.append_uint32(monster.ID);
+    o.append_uint32(monster.HP);
+    o.append_float(monster.Position.x);
+    o.append_float(monster.Position.y);
+  }
+  o.finish();
+  return o.buffer;
+}
+
+packet.make_online_monster_eliminate = (monsterID, itemPool) => {
+  let o = new packet_writer(packet.SC_ONLINE_MONSTER_ELIMINATE);
+  o.append_uint32(monsterID);
+  o.append_uint8(itemPool.length);
+  itemPool.forEach((item) => {
+    o.append_int32(item.ItemID);
+  })
+  o.finish();
+  return o.buffer;
+}
+
+packet.make_online_monster_reward = (monsterID, attackData) => {
+  let o = new packet_writer(packet.SC_ONLINE_MONSTER_REWARD);
+  //ID[int] Damage[int] EXPReceive[int] Killer[bool]
+  o.append_uint32(monsterID);
+  o.append_uint32(attackData.EXPReceive);
+  o.append_int8(attackData.Killer? 1:0);
+  o.finish();
+  return o.buffer;
+}
+
+
+packet.make_online_realtime_control = (playerDatas, monsterDatas, monsterHurtDatas) => {
+  let o = new packet_writer(packet.SC_ONLINE_REALTIME_CONTROL);
+  // Player
+  o.append_uint16(playerDatas.length); //add length first to tell client before loop
+  for (let i = 0; i < playerDatas.length; i++) {
+    // UID, Name, HP,SP,Job,Level,Equipment,Position only
+    //current : uid, position, velocity, scaleX , animation
+    o.append_uint32(playerDatas[i].UID);
+    o.append_float(playerDatas[i].Position.x);
+    o.append_float(playerDatas[i].Position.y);
+    o.append_float(playerDatas[i].Velocity.x);
+    o.append_float(playerDatas[i].Velocity.y);
+    o.append_float(playerDatas[i].ScaleX);
+    o.append_int8(playerDatas[i].Animation);
+  }
+  // Monster Control
+  o.append_uint8(monsterDatas.length);
+  for (let i = 0; i < monsterDatas.length; i++) {
+    o.append_uint32(monsterDatas[i].ID);
+    o.append_uint32(monsterDatas[i].HP);
+    o.append_float(monsterDatas[i].Position.x);
+    o.append_float(monsterDatas[i].Position.y);
+  }
+  // Monster Hurt
+  o.append_uint8(monsterHurtDatas.length);
+  for (let i = 0; i < monsterHurtDatas.length; i++) {
+    o.append_uint32(monsterHurtDatas[i].ID);
+    o.append_uint32(monsterHurtDatas[i].Damage);
+    o.append_uint32(monsterHurtDatas[i].HPLeft);
+    o.append_int8(monsterHurtDatas[i].KnockbackDirection);
+
+  }
+  o.finish();
+  return o.buffer;
+}
+//------------- Commuinity Part
 packet.make_chat = function (msg) {
   let o = new packet_writer(packet.SC_CHAT);
   o.append_string(msg);
@@ -398,7 +518,7 @@ packet.make_notification = function (noti) {
 // Custom method
 ////////////////////////////////////////////////////////////////////////////////
 
-function convertCharacterDataToPacketData(packet,character){
+function convertCharacterDataToPacketData(packet, character) {
   packet.append_string(character.Name);// character name  
   //////////////////////////////////////////      
   ///////////// Status
