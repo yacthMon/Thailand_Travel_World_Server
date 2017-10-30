@@ -36,6 +36,7 @@ let packet = {
   CS_INVENTORY_INCREASE: 12026,
   CS_INVENTORY_DECREASE: 12027,
   CS_INVENTORY_REMOVE: 12028,
+  CS_INVENTORY_UPDATE_MONEY: 12029,
   // Monster Part
   CS_SEND_MONSTER_HURT: 12201,
   CS_CHAT: 12101,
@@ -211,6 +212,11 @@ packet[packet.CS_INVENTORY_DECREASE] = (remoteProxy, data) => {
 packet[packet.CS_INVENTORY_REMOVE] = (remoteProxy, data) => {
   let itemId = data.read_uint32();  
   remoteProxy.removeItemFromInventory(itemId);
+}
+
+packet[packet.CS_INVENTORY_UPDATE_MONEY] = (remoteProxy, data) => {
+  let money = data.read_uint32();  
+  remoteProxy.updateMoney(money);
 }
 
 // Monster part
@@ -559,7 +565,7 @@ function convertCharacterDataToPacketData(packet, character) {
   packet.append_float(character.Location.Position.y);    // Y
   //////////////////////////////////////////
   // Inventory
-  packet.append_int32(character.Inventory.Gold);   // Gold
+  packet.append_int32(character.Inventory.Money);   // Gold
   if (character.Inventory.Items) { // if have Item
     packet.append_int8(character.Inventory.Items.length); // append length of item
     for (let j = 0; j < character.Inventory.Items.length; j++) {// Append data for each Itme

@@ -166,7 +166,7 @@ class RemoteProxy extends server.RemoteProxy {
         ATK: 20,
         DEF: 5,
         Equipment: {
-          Head: 0,
+          Head: 1,
           Body: 1,
           Weapon: 1
         }
@@ -176,7 +176,7 @@ class RemoteProxy extends server.RemoteProxy {
         Map: "Bangkok",
       },
       Inventory: {
-        Gold: 100,
+        Money: 100,
         Items: []
       }
     };
@@ -287,6 +287,10 @@ class RemoteProxy extends server.RemoteProxy {
     if (indexOfItem > -1) {
       this.character.Inventory.Items.splice(indexOfItem, 1);
     }
+  }
+
+  updateMoney(money){
+    this.character.Inventory.Money = money;
   }
   // --------- Inventory
   // --------- Monster
