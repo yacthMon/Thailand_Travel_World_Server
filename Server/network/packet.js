@@ -210,12 +210,12 @@ packet[packet.CS_INVENTORY_DECREASE] = (remoteProxy, data) => {
 }
 
 packet[packet.CS_INVENTORY_REMOVE] = (remoteProxy, data) => {
-  let itemId = data.read_uint32();  
+  let itemId = data.read_uint32();
   remoteProxy.removeItemFromInventory(itemId);
 }
 
 packet[packet.CS_INVENTORY_UPDATE_MONEY] = (remoteProxy, data) => {
-  let money = data.read_uint32();  
+  let money = data.read_uint32();
   remoteProxy.updateMoney(money);
 }
 
@@ -479,7 +479,7 @@ packet.make_online_monster_reward = (monsterID, attackData) => {
   //ID[int] Damage[int] EXPReceive[int] Killer[bool]
   o.append_uint32(monsterID);
   o.append_uint32(attackData.EXPReceive);
-  o.append_int8(attackData.Killer? 1:0);
+  o.append_int8(attackData.Killer ? 1 : 0);
   o.finish();
   return o.buffer;
 }
@@ -576,6 +576,14 @@ function convertCharacterDataToPacketData(packet, character) {
   } else {
     packet.append_int8(0); // don't have any Item
   }
+  ///////////////////////////////////////////
+  // Quest Success
+  packet.append_uint16(character.Quest.Success.length);
+  for (let i = 0; i < character.Quest.Success.length; i++) {
+    packet.append_uint16(character.Quest.Success[i]);
+  }
+
+
   return packet;
 }
 

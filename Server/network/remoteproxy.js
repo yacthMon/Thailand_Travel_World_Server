@@ -178,6 +178,10 @@ class RemoteProxy extends server.RemoteProxy {
       Inventory: {
         Money: 100,
         Items: []
+      },
+      Quest: {
+        Success: [],
+        Process: []
       }
     };
     let result = await db.createCharacter(this.userdata._id, data);
@@ -232,7 +236,7 @@ class RemoteProxy extends server.RemoteProxy {
 
   playerChangeMap(mapName, position) {
     monsterController.clearMonsterAngryTo(this.userdata._id);
-    world.removeRemote(this);    
+    world.removeRemote(this);
     monitor.debug("ID : " + this.userdata._id + " change map form " + this.character.Location.Map + " to " + mapName);
     this.character.Location.Map = mapName;
     this.character.Location.Position = position;
@@ -259,7 +263,7 @@ class RemoteProxy extends server.RemoteProxy {
     status.Equipment = this.character.Status.Equipment;
     // Overwrite character status with status parameter
     this.character.Status = status;
-    if(status.HP <=0){// Oh no player die :(
+    if (status.HP <= 0) {// Oh no player die :(
       monsterController.clearMonsterAngryTo(this.userdata._id);
     }
   }
@@ -289,7 +293,7 @@ class RemoteProxy extends server.RemoteProxy {
     }
   }
 
-  updateMoney(money){
+  updateMoney(money) {
     this.character.Inventory.Money = money;
   }
   // --------- Inventory
@@ -301,6 +305,23 @@ class RemoteProxy extends server.RemoteProxy {
     }
   }
   // --------- Monster
+  // --------- Quest
+  saveSuccessQuest(questID) {
+    let indexOfQuest = this.character.Quest.Success.findIndex((quest) => { return quest.QuestID == questID });
+    if (indexOfQuest == -1) {
+      this.character.Quest.Success.push({ "QuestID": questID });
+    }
+  }
+
+  saveProcessQuest(questID, currentTotal) {
+    let indexOfQuest = this.character.Quest.Process.findIndex((quest) => { return quest.QuestID == questID });
+    if (indexOfQuest == -1) {
+      this.character.Quest.Process.push({ "QuestID": questID, "CurrentTotal": currentTotal });
+    } else {
+      this.character.Quest.Process.splice(indexOfItem, 1, { "QuestID": questID, "CurrentTotal": currentTotal });
+    }
+  }
+  // --------- Quest
 
   chat(msg) {
     console.log('RemoteProxy chat: ' + msg)
@@ -311,9 +332,9 @@ class RemoteProxy extends server.RemoteProxy {
     console.log('RemoteProxy notification : ' + notic)
     // world.broadcast(packet.make_notification(notic))
   }
-
-
 }
+
+
 function countClient() {
   return clientCount;
 }
