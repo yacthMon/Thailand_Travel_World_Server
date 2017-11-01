@@ -39,6 +39,10 @@ let packet = {
   CS_INVENTORY_UPDATE_MONEY: 12029,
   // Monster Part
   CS_SEND_MONSTER_HURT: 12201,
+  //------- Quest Part
+  CS_SEND_QUEST_ACCEPT: 12300,
+  CS_SEND_QUEST_UPDATE: 12301,
+  CS_SEND_QUEST_SUCCESS: 12302,
   CS_CHAT: 12101,
   CS_NOTIFICATION: 12102,
 
@@ -227,6 +231,23 @@ packet[packet.CS_SEND_MONSTER_HURT] = (remoteProxy, data) => {
   remoteProxy.attackMonster(idMonster, knockback);
 }
 
+// Quest part
+// 12300
+packet[packet.CS_SEND_QUEST_ACCEPT] = (remoteProxy, data) => {
+  let questID = data.read_uint16();  
+  remoteProxy.acceptQuest(questID);
+}
+// 12301
+packet[packet.CS_SEND_QUEST_UPDATE] = (remoteProxy, data) => {
+  let questID = data.read_uint16();
+  let currentTotal = data.read_uint16();
+  remoteProxy.updateProcessQuest(questID, currentTotal);
+}
+// 12302
+packet[packet.CS_SEND_QUEST_SUCCESS] = (remoteProxy, data) => {
+  let questID = data.read_uint16();
+  remoteProxy.successQuest(questID);
+}
 
 packet[packet.CS_CHAT] = function (remoteProxy, data) {
   let msg = data.read_string();
@@ -580,10 +601,14 @@ function convertCharacterDataToPacketData(packet, character) {
   // Quest Success
   packet.append_uint16(character.Quest.Success.length);
   for (let i = 0; i < character.Quest.Success.length; i++) {
-    packet.append_uint16(character.Quest.Success[i]);
+    packet.append_uint16(character.Quest.Success[i].QuestID);
   }
-
-
+  // Quest Process
+  packet.append_uint16(character.Quest.Process.length);
+  for (let i = 0; i < character.Quest.Process.length; i++) {    
+    packet.append_uint16(character.Quest.Process[i].QuestID);
+    packet.append_uint16(character.Quest.Process[i].CurrentTotal);
+  }
   return packet;
 }
 

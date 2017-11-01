@@ -306,19 +306,31 @@ class RemoteProxy extends server.RemoteProxy {
   }
   // --------- Monster
   // --------- Quest
-  saveSuccessQuest(questID) {
-    let indexOfQuest = this.character.Quest.Success.findIndex((quest) => { return quest.QuestID == questID });
+
+  acceptQuest(questID){
+    let indexOfQuest = this.character.Quest.Process.findIndex((quest) => { return quest.QuestID == questID });
     if (indexOfQuest == -1) {
-      this.character.Quest.Success.push({ "QuestID": questID });
+      this.character.Quest.Process.push({ "QuestID": questID , "CurrentTotal":0});
     }
   }
 
-  saveProcessQuest(questID, currentTotal) {
+  successQuest(questID) {
+    let indexOfQuest = this.character.Quest.Process.findIndex((quest) => { return quest.QuestID == questID });
+    if (indexOfQuest != -1) {
+      this.character.Quest.Process.splice(indexOfQuest, 1);
+      indexOfQuest = this.character.Quest.Success.findIndex((quest) => { return quest.QuestID == questID });
+      if (indexOfQuest == -1) {
+        this.character.Quest.Success.push({ "QuestID": questID });
+      }
+    }
+  }
+
+  updateProcessQuest(questID, currentTotal) {
     let indexOfQuest = this.character.Quest.Process.findIndex((quest) => { return quest.QuestID == questID });
     if (indexOfQuest == -1) {
       this.character.Quest.Process.push({ "QuestID": questID, "CurrentTotal": currentTotal });
     } else {
-      this.character.Quest.Process.splice(indexOfItem, 1, { "QuestID": questID, "CurrentTotal": currentTotal });
+      this.character.Quest.Process[indexOfQuest].CurrentTotal = currentTotal;
     }
   }
   // --------- Quest
