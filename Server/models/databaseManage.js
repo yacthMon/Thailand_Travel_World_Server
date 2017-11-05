@@ -90,7 +90,7 @@ class mongoDB {
                     Checkin: [],
                     Friends: []
                 };
-                this.db.collection("TTW").insertOne(data, (err, res) => {
+                this.db.collection("Account").insertOne(data, (err, res) => {
                     if (err) { reject(err); return; }
                     resolve(undefined, res);
                 })
@@ -115,7 +115,7 @@ class mongoDB {
                     Checkin: [],
                     Friends: []
                 };
-                this.db.collection("TTW").insertOne(data, (err, res) => {
+                this.db.collection("Account").insertOne(data, (err, res) => {
                     if (err) { reject(err); return; }
                     resolve(undefined, res);
                 })
@@ -128,7 +128,7 @@ class mongoDB {
 
     async isUsernameExist(username) {
         return new Promise((resolve, reject) => {
-            this.db.collection("TTW").findOne({ Username: username }, (err, data) => {
+            this.db.collection("Account").findOne({ Username: username }, (err, data) => {
                 if (err) { reject(err); return; }
                 resolve(data ? true : false);
             })
@@ -137,7 +137,7 @@ class mongoDB {
 
     async isFacebookIdExist(fbid) {
         return new Promise((resolve, reject) => {
-            this.db.collection("TTW").findOne({ FacebookId: fbid }, (err, data) => {
+            this.db.collection("Account").findOne({ FacebookId: fbid }, (err, data) => {
                 if (err) { reject(err); return; }
                 resolve(data ? true : false);
             })
@@ -157,7 +157,7 @@ class mongoDB {
 
     async doLogin(username, password) {
         return new Promise((resolve, reject) => {
-            this.db.collection("TTW").findOne({ Username: username }, (err, user) => {
+            this.db.collection("Account").findOne({ Username: username }, (err, user) => {
                 if (err) { reject(err); return; }
                 if (user) {
                     //found user                    
@@ -177,7 +177,7 @@ class mongoDB {
 
     async doLoginWithFacebook(fbid, token) {
         return new Promise((resolve, reject) => {
-            this.db.collection("TTW").findOne({ FacebookId: fbid }, (err, user) => {
+            this.db.collection("Account").findOne({ FacebookId: fbid }, (err, user) => {
                 if (err) { reject(err); return; }
                 if (user) {
                     //found user
@@ -192,7 +192,7 @@ class mongoDB {
 
     async isCharacterNameExist(name) {
         return new Promise((resolve, reject) => {
-            this.db.collection("TTW").findOne({ "Characters.Name": name }, (err, data) => {
+            this.db.collection("Account").findOne({ "Characters.Name": name }, (err, data) => {
                 if (err) { reject(err); return; }
                 resolve(data ? true : false);
             })
@@ -201,7 +201,7 @@ class mongoDB {
 
     async createCharacter(userid, characterData) {
         return new Promise((resolve, reject) => {
-            this.db.collection("TTW").update({ _id: userid }, { $push: { "Characters": characterData } }, (err, data) => {
+            this.db.collection("Account").update({ _id: userid }, { $push: { "Characters": characterData } }, (err, data) => {
                 if (err) { reject(err); return; }
                 resolve(data.result.n > 0 ? characterData : false);
             })
@@ -210,7 +210,7 @@ class mongoDB {
 
     async updateCharacterData(characterData) {
         return new Promise((resolve, reject) => {
-            this.db.collection("TTW").update({ "Characters.Name": characterData.Name },
+            this.db.collection("Account").update({ "Characters.Name": characterData.Name },
                 { $set: { "Characters.$": characterData } }, (err, data) => {
                     if (err) { reject(err); return; }
                     resolve(data.result.n > 0 ? true : false);
