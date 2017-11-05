@@ -488,8 +488,8 @@ packet.make_online_monster_eliminate = (monsterID, itemPool) => {
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_ELIMINATE);
   o.append_uint32(monsterID);
   o.append_uint8(itemPool.length);
-  itemPool.forEach((item) => {
-    o.append_int32(item.ItemID);
+  itemPool.forEach((itemID) => {
+    o.append_int32(itemID);
   })
   o.finish();
   return o.buffer;
