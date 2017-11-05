@@ -166,9 +166,9 @@ class RemoteProxy extends server.RemoteProxy {
         ATK: 20,
         DEF: 5,
         Equipment: {
-          Head: 1,
-          Body: 1,
-          Weapon: 1
+          Head: "1",
+          Body: "1",
+          Weapon: "1"
         }
       },
       Location: {

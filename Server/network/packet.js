@@ -576,9 +576,9 @@ function convertCharacterDataToPacketData(packet, character) {
   packet.append_int32(character.Status.DEf);     // DEF
   //////////////////////////////////////////
   // Equipment
-  packet.append_int16(character.Status.Equipment.Head);    // HEAD
-  packet.append_int16(character.Status.Equipment.Body);    // BODY
-  packet.append_int16(character.Status.Equipment.Weapon);  // WEAPON
+  packet.append_string(character.Status.Equipment.Head);    // HEAD
+  packet.append_string(character.Status.Equipment.Body);    // BODY
+  packet.append_string(character.Status.Equipment.Weapon);  // WEAPON
   //////////////////////////////////////////
   // Location
   packet.append_string(character.Location.Map);  // Current Map
