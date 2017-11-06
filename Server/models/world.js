@@ -66,7 +66,7 @@ class World {
                 monsterInWorld.push({
                     ID: monster.ID,
                     MonsterID: monster.monsterID,
-                    HP: monster.Status.HP,
+                    Status: monster.Status,
                     Position: {
                         x: monster.Location.CurrentPosition.x,
                         y: monster.Location.CurrentPosition.y
