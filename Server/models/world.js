@@ -64,8 +64,9 @@ class World {
         this.monsterControl.monsterList.forEach((monster) => { // send monster already in world
             if (monster.Location.Map === remote.character.Location.Map) {                
                 monsterInWorld.push({
-                    ID: monster.ID,
+                    ID: monster.ID,                    
                     MonsterID: monster.monsterID,
+                    Name: monster.Name,
                     Status: monster.Status,
                     Position: {
                         x: monster.Location.CurrentPosition.x,

@@ -6,7 +6,7 @@ class Monster {
     constructor(data) {
         if (data) {
             this.ID = data.ID;
-            this.monsterID = data.monsterID;
+            this.monsterID = data.monsterID;            
             this.Location = data.Location;
             this.SpawnerID = data.SpawnerID;
             this.getMonsterData(this.mosnterID);
@@ -43,6 +43,7 @@ class Monster {
 
     async getMonsterData() {
         let monsterdata = await db.getMonster(this.monsterID);
+        this.Name = monsterdata.Name;
         this.ItemDrop = monsterdata.ItemDrop;
         this.Status = monsterdata.Status;
         this.Status.MaxHP = this.Status.HP

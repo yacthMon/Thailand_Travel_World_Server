@@ -447,7 +447,8 @@ packet.make_online_monster_in_world = (monsters) => {
     let monster = monsters[i];
     o.append_uint32(monster.ID);
     o.append_uint32(monster.MonsterID);
-    o.append_uint32(monster.Status.Level);
+    o.append_string(monster.Name);
+    o.append_uint8(monster.Status.Level);
     o.append_uint32(monster.Status.HP);
     o.append_uint8(monster.Status.MovementSpeed);
     o.append_uint32(monster.Status.EXP);
@@ -464,7 +465,8 @@ packet.make_online_monster_spawn = (monster) => {
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_SPAWN);
   o.append_uint32(monster.ID);
   o.append_uint32(monster.monsterID);
-  o.append_uint32(monster.Status.Level);
+  o.append_string(monster.Name);
+  o.append_uint8(monster.Status.Level);
   o.append_uint32(monster.Status.HP);
   o.append_uint8(monster.Status.MovementSpeed);
   o.append_uint32(monster.Status.EXP);
