@@ -423,7 +423,6 @@ packet.make_multiplayer_in_same_map = function (players) {
     o.append_string(players[i].Job);
     o.append_uint32(players[i].HP);
     o.append_uint32(players[i].SP);
-    o.append_string(players[i].Job);
     o.append_uint32(players[i].Level);
     o.append_string(players[i].Equipment.Head);
     o.append_string(players[i].Equipment.Body);
