@@ -385,9 +385,9 @@ packet.make_multiplayer_connect = function (uid, character) {
   o.append_uint32(character.Status.HP);
   o.append_uint32(character.Status.SP);
   o.append_uint32(character.Status.Level);
-  o.append_uint32(character.Status.Equipment.Head);
-  o.append_uint32(character.Status.Equipment.Body);
-  o.append_uint32(character.Status.Equipment.Weapon);
+  o.append_string(character.Status.Equipment.Head);
+  o.append_string(character.Status.Equipment.Body);
+  o.append_string(character.Status.Equipment.Weapon);
   o.finish();
   return o.buffer;
 }
@@ -425,9 +425,9 @@ packet.make_multiplayer_in_same_map = function (players) {
     o.append_uint32(players[i].SP);
     o.append_string(players[i].Job);
     o.append_uint32(players[i].Level);
-    o.append_uint32(players[i].Equipment.Head);
-    o.append_uint32(players[i].Equipment.Body);
-    o.append_uint32(players[i].Equipment.Weapon);
+    o.append_string(players[i].Equipment.Head);
+    o.append_string(players[i].Equipment.Body);
+    o.append_string(players[i].Equipment.Weapon);
   }
   o.finish();
   return o.buffer;
