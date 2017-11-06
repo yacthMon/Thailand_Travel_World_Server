@@ -63,21 +63,7 @@ class World {
         })
         this.monsterControl.monsterList.forEach((monster) => { // send monster already in world
             if (monster.Location.Map === remote.character.Location.Map) {                
-                monsterInWorld.push({
-                    ID: monster.ID,                    
-                    MonsterID: monster.monsterID,
-                    Name: monster.Name,
-                    Status: monster.Status,
-                    Position: {
-                        x: monster.Location.CurrentPosition.x,
-                        y: monster.Location.CurrentPosition.y
-                    },
-                    TargetPosition: {
-                        x: monster.Location.TargetPosition.x,
-                        y: monster.Location.TargetPosition.y
-                    }
-
-                });
+                monsterInWorld.push(monster);
             }
         });
         remote.send(packet.make_online_monster_in_world(monsterInWorld));

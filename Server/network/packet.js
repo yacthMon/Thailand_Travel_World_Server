@@ -327,7 +327,7 @@ packet.make_account_data = (data) => {
     o.append_int8(data.Characters.length); // Length of Character
     for (let i = 0; i < data.Characters.length; i++) { // Append data for each character      
       let character = data.Characters[i];
-      o = convertCharacterDataToPacketData(o, character);
+      convertCharacterDataToPacketData(o, character);
     }
   } else {
     o.append_int8(0); // don't have any Character
@@ -350,7 +350,7 @@ packet.make_character_name_already_used = function () {
 
 packet.make_character_create_success = function (character) {
   let o = new packet_writer(packet.SC_CHARACTER_CREATE_SUCCESS);
-  o = convertCharacterDataToPacketData(o, character);
+  convertCharacterDataToPacketData(o, character);
   o.finish();
   return o.buffer;
 }
@@ -445,17 +445,7 @@ packet.make_online_monster_in_world = (monsters) => {
   o.append_uint8(monsters.length);
   for (var i = 0; i < monsters.length; i++) {
     let monster = monsters[i];
-    o.append_uint32(monster.ID);
-    o.append_uint32(monster.MonsterID);
-    o.append_string(monster.Name);
-    o.append_uint8(monster.Status.Level);
-    o.append_uint32(monster.Status.HP);
-    o.append_uint8(monster.Status.MovementSpeed);
-    o.append_uint32(monster.Status.EXP);
-    o.append_float(monster.Position.x);
-    o.append_float(monster.Position.y);
-    o.append_float(monster.TargetPosition.x);
-    o.append_float(monster.TargetPosition.y);
+    convertMonsterDataToPacketData(o,monster);
   }
   o.finish();
   return o.buffer;
@@ -463,17 +453,7 @@ packet.make_online_monster_in_world = (monsters) => {
 
 packet.make_online_monster_spawn = (monster) => {
   let o = new packet_writer(packet.SC_ONLINE_MONSTER_SPAWN);
-  o.append_uint32(monster.ID);
-  o.append_uint32(monster.monsterID);
-  o.append_string(monster.Name);
-  o.append_uint8(monster.Status.Level);
-  o.append_uint32(monster.Status.HP);
-  o.append_uint8(monster.Status.MovementSpeed);
-  o.append_uint32(monster.Status.EXP);
-  o.append_float(monster.Location.CurrentPosition.x);
-  o.append_float(monster.Location.CurrentPosition.y);
-  o.append_float(monster.Location.TargetPosition.x);
-  o.append_float(monster.Location.TargetPosition.y);
+  convertMonsterDataToPacketData(o,monster);
   o.finish();
   return o.buffer;
 }
@@ -617,7 +597,22 @@ function convertCharacterDataToPacketData(packet, character) {
     packet.append_uint16(character.Quest.Process[i].QuestID);
     packet.append_uint16(character.Quest.Process[i].CurrentTotal);
   }
-  return packet;
+  // return packet;
+}
+
+function convertMonsterDataToPacketData(packet, monster){
+  packet.append_uint32(monster.ID);
+  packet.append_uint32(monster.monsterID);
+  packet.append_string(monster.Name);
+  packet.append_uint8(monster.Status.Level);
+  packet.append_uint32(monster.Status.HP);
+  packet.append_uint8(monster.Status.MovementSpeed);
+  packet.append_uint32(monster.Status.EXP);
+  packet.append_float(monster.Location.CurrentPosition.x);
+  packet.append_float(monster.Location.CurrentPosition.y);
+  packet.append_float(monster.Location.TargetPosition.x);
+  packet.append_float(monster.Location.TargetPosition.y);
+  // return packet;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
