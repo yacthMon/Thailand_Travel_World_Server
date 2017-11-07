@@ -43,6 +43,8 @@ let packet = {
   CS_SEND_QUEST_ACCEPT: 12300,
   CS_SEND_QUEST_UPDATE: 12301,
   CS_SEND_QUEST_SUCCESS: 12302,
+  // Checkin Part
+  CS_SEND_CHECKIN: 12400,
   CS_CHAT: 12101,
   CS_NOTIFICATION: 12102,
 
@@ -248,6 +250,12 @@ packet[packet.CS_SEND_QUEST_UPDATE] = (remoteProxy, data) => {
 packet[packet.CS_SEND_QUEST_SUCCESS] = (remoteProxy, data) => {
   let questID = data.read_uint16();
   remoteProxy.successQuest(questID);
+}
+// 12400
+packet[packet.CS_SEND_CHECKIN] = (remoteProxy, data) => {
+  let placeID = data.read_uint8();
+  let time = data.read_string();
+  remoteProxy.checkin(placeID,time);
 }
 
 packet[packet.CS_CHAT] = function (remoteProxy, data) {

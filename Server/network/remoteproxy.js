@@ -335,7 +335,11 @@ class RemoteProxy extends server.RemoteProxy {
     }
   }
   // --------- Quest
-
+  // --------- Checkin
+    checkin(placeID,time){
+      this.character.CheckIn.push({"PlaceID":placeID, "Time":time});
+    }
+  // --------- Checkin
   chat(msg) {
     console.log('RemoteProxy chat: ' + msg)
     // world.broadcast(packet.make_chat(msg))
