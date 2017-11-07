@@ -150,7 +150,7 @@ class RemoteProxy extends server.RemoteProxy {
     }
   }
 
-  async createCharacter(name, gender, job) {
+  async createCharacter(name, gender, job,hair) {
     let data = {
       Name: name,
       Status: {
@@ -166,7 +166,7 @@ class RemoteProxy extends server.RemoteProxy {
         ATK: 20,
         DEF: 5,
         Equipment: {
-          Head: "1",
+          Head: hair,
           Body: "1",
           Weapon: "1"
         }

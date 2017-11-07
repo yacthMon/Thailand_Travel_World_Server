@@ -131,8 +131,9 @@ packet[packet.CS_CREATE_CHARACTER] = function (remoteProxy, data) {
   let name = data.read_string();
   let gender = data.read_string();
   let job = data.read_string();
+  let hair = data.read_string();
   if (!data.completed()) return true;
-  remoteProxy.createCharacter(name, gender, job);
+  remoteProxy.createCharacter(name, gender, job,hair);
 }
 
 packet[packet.CS_AUTHENTICATION_WITH_FACEBOOK] = function (remoteProxy, data) {
@@ -573,7 +574,7 @@ function convertCharacterDataToPacketData(packet, character) {
   packet.append_float(character.Location.Position.y);    // Y
   //////////////////////////////////////////
   // Inventory
-  packet.append_int32(character.Inventory.Money);   // Gold
+  packet.append_int32(character.Inventory.Money);   // Money
   if (character.Inventory.Items) { // if have Item
     packet.append_int8(character.Inventory.Items.length); // append length of item
     for (let j = 0; j < character.Inventory.Items.length; j++) {// Append data for each Itme
