@@ -597,6 +597,13 @@ function convertCharacterDataToPacketData(packet, character) {
     packet.append_uint16(character.Quest.Process[i].QuestID);
     packet.append_uint16(character.Quest.Process[i].CurrentTotal);
   }
+  /////////////////////////////////////////////
+  // CheckIn
+  packet.append_uint8(character.CheckIn.length);
+  for(let i=0; i<character.CheckIn.length; i++){
+    packet.append_uint8(character.CheckIn[i].PlaceID);
+    packet.append_string(character.CheckIn[i].Time);
+  }
   // return packet;
 }
 

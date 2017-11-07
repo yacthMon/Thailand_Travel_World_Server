@@ -112,7 +112,6 @@ class mongoDB {
                     Email: email,
                     Gender: gender,
                     Characters: [],
-                    Checkin: [],
                     Friends: []
                 };
                 this.db.collection("Account").insertOne(data, (err, res) => {

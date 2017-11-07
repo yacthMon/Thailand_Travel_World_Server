@@ -182,7 +182,8 @@ class RemoteProxy extends server.RemoteProxy {
       Quest: {
         Success: [],
         Process: []
-      }
+      },
+      CheckIn:[]
     };
     let result = await db.createCharacter(this.userdata._id, data);
     if (result) {
