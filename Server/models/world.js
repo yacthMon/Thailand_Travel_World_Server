@@ -43,7 +43,9 @@ class World {
         let monsterInWorld = [];
         let playerInWorld = [];
         this.remotes.forEach((otherRemote) => { // stored players that already in world to playerInWorld array
-            if (otherRemote.character.Location.Map === remote.character.Location.Map) { // if in same map
+            if(otherRemote.userdata._id == remote.userdata._id){
+                otherRemote.send(packet.make_error("มีผู้อื่นทำการ Login ด้วย account นี้"));
+            }else if (otherRemote.character.Location.Map === remote.character.Location.Map) { // if in same map
                 let character = otherRemote.character;
                 playerInWorld.push({
                     "UID": otherRemote.userdata._id,
