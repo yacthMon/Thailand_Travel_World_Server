@@ -621,6 +621,7 @@ function convertMonsterDataToPacketData(packet, monster){
   packet.append_string(monster.Name);
   packet.append_uint8(monster.Status.Level);
   packet.append_uint32(monster.Status.HP);
+  packet.append_uint32(monster.Status.MaxHP);
   packet.append_uint16(monster.Status.ATK);
   packet.append_uint16(monster.Status.DEF);
   packet.append_uint8(monster.Status.MovementSpeed);  
