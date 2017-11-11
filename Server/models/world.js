@@ -158,8 +158,7 @@ class World {
                     y: monster.Location.CurrentPosition.y
                 },
                 Map: monster.Location.Map
-            });
-            monitor.log("Item apear in world");
+            });            
         });
         this.remotes.forEach((remote) => {
             if (remote.character.Location.Map == monster.Location.Map) {                
@@ -178,8 +177,7 @@ class World {
         if(indexOfItem > -1){
             this.items.splice(indexOfItem,1);
             this.remotes.forEach((remote)=>{//send remove online item for every player in same map
-                if(remote.character.Location.Map == player.character.Location.Map ){
-                    monitor.log("Send remove data");
+                if(remote.character.Location.Map == player.character.Location.Map ){                    
                     remote.send(packet.make_online_item_remove(itemOnlineID));
                 }
             })
