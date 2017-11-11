@@ -45,6 +45,8 @@ let packet = {
   CS_SEND_QUEST_SUCCESS: 12302,
   // Checkin Part
   CS_SEND_CHECKIN: 12400,
+  // Item Part
+  CS_REQUEST_GET_ITEM: 12410,
   CS_CHAT: 12101,
   CS_NOTIFICATION: 12102,
 
@@ -82,6 +84,7 @@ let packet = {
   SC_ONLINE_MONSTER_REWARD: 22204,
   //------- Item Part
   SC_ONLINE_ITEM_IN_WORLD: 22300,
+  SC_GET_ITEM_GRANT:22301,
   //------- Community Part
   SC_CHAT: 22026,
   SC_NOTIFICATION: 22027,
@@ -258,6 +261,11 @@ packet[packet.CS_SEND_CHECKIN] = (remoteProxy, data) => {
   let placeID = data.read_uint8();
   let time = data.read_string();
   remoteProxy.checkin(placeID,time);
+}
+// 12410
+packet[packet.CS_REQUEST_GET_ITEM] = (remoteProxy,data)=>{
+  let itemOnlineID = data.read_uint32();
+  remoteProxy.getOnlineItem(itemOnlineID);
 }
 
 packet[packet.CS_CHAT] = function (remoteProxy, data) {
@@ -551,6 +559,13 @@ packet.make_online_item_in_world = (itemsInWorld)=>{
     o.append_float(itemsInWorld[i].Position.y);
   }
   o.finish();
+  return o.buffer;
+}
+
+packet.make_get_item_grant = (itemOnlineID)=>{
+  let o = new packet_writer(packet.SC_GET_ITEM_GRANT);
+  o.append_uint32(itemOnlineID);
+  o.finish()
   return o.buffer;
 }
 

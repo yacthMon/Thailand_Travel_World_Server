@@ -151,9 +151,10 @@ class World {
             if (remote.character.Location.Map == monster.Location.Map) {
                 // add detail to each item
                 monster.ItemPool.forEach((item) => {
+                    item.OnlineID = this.itemOnlineId++
                     this.items.push({
                         ItemID: item.ItemID,
-                        OnlineID: this.itemOnlineId++,
+                        OnlineID: item.OnlineID,
                         Position: {
                             x: monster.Location.CurrentPosition.x,
                             y: monster.Location.CurrentPosition.y
@@ -170,6 +171,15 @@ class World {
                 }
             }
         });
+    }
+
+    async playerGetItem(itemOnlineID){
+        let indexOfItem = this.items.findIndex((item)=>{ return item.OnlineID == itemOnlineID});
+        if(indexOfItem > -1){
+            this.items.splice(indexOfItem,1);
+            return true;
+        }
+        return false;
     }
 
     startQueueResponse() {

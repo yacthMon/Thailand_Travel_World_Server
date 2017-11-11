@@ -340,6 +340,16 @@ class RemoteProxy extends server.RemoteProxy {
       this.character.CheckIn.push({"PlaceID":placeID, "Time":time});
     }
   // --------- Checkin
+  // --------- ItemOnline
+  async getOnlineItem(onlineItemID){
+    if(await world.playerGetItem(onlineItemID)){
+      this.send(packet.make_get_item_grant(onlineItemID));
+    } else {
+      monitor.log("item not exist in world");
+    }
+  }
+  // --------- ItemOnline
+  
   chat(msg) {
     console.log('RemoteProxy chat: ' + msg)
     // world.broadcast(packet.make_chat(msg))
