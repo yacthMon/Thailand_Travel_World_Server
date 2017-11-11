@@ -147,22 +147,22 @@ class World {
 
     eliminateMonster(monster) {
         this.monsterControl.deleteMonsterFromList(monster.ID, monster.SpawnerID);
+        // add detail to each item
+        monster.ItemPool.forEach((item) => {
+            item.OnlineID = this.itemOnlineId++
+            this.items.push({
+                ItemID: item.ItemID,
+                OnlineID: item.OnlineID,
+                Position: {
+                    x: monster.Location.CurrentPosition.x,
+                    y: monster.Location.CurrentPosition.y
+                },
+                Map: monster.Location.Map
+            });
+            monitor.log("Item apear in world");
+        });
         this.remotes.forEach((remote) => {
-            if (remote.character.Location.Map == monster.Location.Map) {
-                // add detail to each item
-                monster.ItemPool.forEach((item) => {
-                    item.OnlineID = this.itemOnlineId++
-                    this.items.push({
-                        ItemID: item.ItemID,
-                        OnlineID: item.OnlineID,
-                        Position: {
-                            x: monster.Location.CurrentPosition.x,
-                            y: monster.Location.CurrentPosition.y
-                        },
-                        Map: monster.Location.Map
-                    });
-                    monitor.log("Item apear in world");
-                });
+            if (remote.character.Location.Map == monster.Location.Map) {                
                 remote.send(packet.make_online_monster_eliminate(monster.ID, monster.ItemPool));
                 // find attack data for if this remote attack this monster
                 let attacking = monster.attackers.find((attacker) => { return attacker.ID == remote.userdata._id })
@@ -173,10 +173,16 @@ class World {
         });
     }
 
-    async playerGetItem(itemOnlineID){
+    async playerGetItem(player, itemOnlineID){
         let indexOfItem = this.items.findIndex((item)=>{ return item.OnlineID == itemOnlineID});
         if(indexOfItem > -1){
             this.items.splice(indexOfItem,1);
+            this.remotes.forEach((remote)=>{//send remove online item for every player in same map
+                if(remote.character.Location.Map == player.character.Location.Map ){
+                    monitor.log("Send remove data");
+                    remote.send(packet.make_online_item_remove(itemOnlineID));
+                }
+            })
             return true;
         }
         return false;

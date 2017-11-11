@@ -85,6 +85,7 @@ let packet = {
   //------- Item Part
   SC_ONLINE_ITEM_IN_WORLD: 22300,
   SC_GET_ITEM_GRANT:22301,
+  SC_ONLINE_ITEM_REMOVE:22302,
   //------- Community Part
   SC_CHAT: 22026,
   SC_NOTIFICATION: 22027,
@@ -569,6 +570,12 @@ packet.make_get_item_grant = (itemOnlineID)=>{
   return o.buffer;
 }
 
+packet.make_online_item_remove = (itemOnlineID)=>{
+  let o = new packet_writer(packet.SC_ONLINE_ITEM_REMOVE);
+  o.append_uint32(itemOnlineID);
+  o.finish()
+  return o.buffer;
+}
 //------------- Commuinity Part
 packet.make_chat = function (msg) {
   let o = new packet_writer(packet.SC_CHAT);
