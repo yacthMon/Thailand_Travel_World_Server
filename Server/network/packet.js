@@ -80,6 +80,8 @@ let packet = {
   SC_ONLINE_MONSTER_CONTROL: 22202,
   SC_ONLINE_MONSTER_ELIMINATE: 22203,
   SC_ONLINE_MONSTER_REWARD: 22204,
+  //------- Item Part
+  SC_ONLINE_ITEM_IN_WORLD: 22300,
   //------- Community Part
   SC_CHAT: 22026,
   SC_NOTIFICATION: 22027,
@@ -538,6 +540,20 @@ packet.make_online_realtime_control = (playerDatas, monsterDatas, monsterHurtDat
   o.finish();
   return o.buffer;
 }
+//------------- Item Part
+packet.make_online_item_in_world = (itemsInWorld)=>{
+  let o = new packet_writer(packet.SC_ONLINE_ITEM_IN_WORLD);
+  o.append_uint8(itemsInWorld.length);
+  for(let i=0;i<itemsInWorld.length;i++){
+    o.append_uint32(itemsInWorld[i].OnlineID);
+    o.append_uint32(itemsInWorld[i].ItemID);
+    o.append_float(itemsInWorld[i].Position.x);
+    o.append_float(itemsInWorld[i].Position.y);
+  }
+  o.finish();
+  return o.buffer;
+}
+
 //------------- Commuinity Part
 packet.make_chat = function (msg) {
   let o = new packet_writer(packet.SC_CHAT);

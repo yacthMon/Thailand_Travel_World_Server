@@ -10,7 +10,7 @@ class World {
         this.responsePlayerDatas = [];
         this.responseMonsterDatas = [];
         this.responseMonsterHurtDatas = [];
-        this.itemsInWorld = [];
+        this.items = [];
         this.itemOnlineId = 0;
         this.monsterControl = undefined;
         //#region Sample Data
@@ -44,10 +44,11 @@ class World {
     addRemote(remote) {
         let monsterInWorld = [];
         let playerInWorld = [];
+        let itemsInWorld = [];
         this.remotes.forEach((otherRemote) => { // stored players that already in world to playerInWorld array
-            if(otherRemote.userdata._id == remote.userdata._id){
+            if (otherRemote.userdata._id == remote.userdata._id) {
                 otherRemote.send(packet.make_error("มีผู้อื่นทำการ Login ด้วย account นี้"));
-            }else if (otherRemote.character.Location.Map === remote.character.Location.Map) { // if in same map
+            } else if (otherRemote.character.Location.Map === remote.character.Location.Map) { // if in same map
                 let character = otherRemote.character;
                 playerInWorld.push({
                     "UID": otherRemote.userdata._id,
@@ -66,11 +67,17 @@ class World {
             }
         })
         this.monsterControl.monsterList.forEach((monster) => { // send monster already in world
-            if (monster.Location.Map === remote.character.Location.Map) {                
+            if (monster.Location.Map === remote.character.Location.Map) {
                 monsterInWorld.push(monster);
             }
         });
+        this.items.forEach((item) => {// send item already in world
+            if (item.Map == remote.character.Location.Map) {
+                itemsInWorld.push(item);
+            }
+        })
         remote.send(packet.make_online_monster_in_world(monsterInWorld));
+        remote.send(packet.make_online_item_in_world(itemsInWorld));
         remote.send(packet.make_multiplayer_in_same_map(playerInWorld)); // send playerInWorld to the client who just enter
         this.remotes.push(remote) // add this client to retmoes               
     }
@@ -143,17 +150,23 @@ class World {
         this.remotes.forEach((remote) => {
             if (remote.character.Location.Map == monster.Location.Map) {
                 // add detail to each item
-                monster.ItemPool.forEach((item)=>{
-                    item.OnlineID = this.itemOnlineId++;
-                    item.Position = monster.Location.CurrentPosition;
-                    item.Map = monster.Location.Map;
-                    this.itemsInWorld.push(item);
+                monster.ItemPool.forEach((item) => {
+                    this.items.push({
+                        ItemID: item.ItemID,
+                        OnlineID: this.itemOnlineId++,
+                        Position: {
+                            x: monster.Location.CurrentPosition.x,
+                            y: monster.Location.CurrentPosition.y
+                        },
+                        Map: monster.Location.Map
+                    });
+                    monitor.log("Item apear in world");
                 });
-                remote.send(packet.make_online_monster_eliminate(monster.ID,monster.ItemPool));
+                remote.send(packet.make_online_monster_eliminate(monster.ID, monster.ItemPool));
                 // find attack data for if this remote attack this monster
-                let attacking = monster.attackers.find((attacker)=>{return attacker.ID == remote.userdata._id})
-                if(attacking){
-                    remote.send(packet.make_online_monster_reward(monster.monsterID,attacking));
+                let attacking = monster.attackers.find((attacker) => { return attacker.ID == remote.userdata._id })
+                if (attacking) {
+                    remote.send(packet.make_online_monster_reward(monster.monsterID, attacking));
                 }
             }
         });
