@@ -10,6 +10,8 @@ class World {
         this.responsePlayerDatas = [];
         this.responseMonsterDatas = [];
         this.responseMonsterHurtDatas = [];
+        this.itemsInWorld = [];
+        this.itemOnlineId = 0;
         this.monsterControl = undefined;
         //#region Sample Data
         /* Response data Player
@@ -140,6 +142,13 @@ class World {
         this.monsterControl.deleteMonsterFromList(monster.ID, monster.SpawnerID);
         this.remotes.forEach((remote) => {
             if (remote.character.Location.Map == monster.Location.Map) {
+                // add detail to each item
+                monster.ItemPool.forEach((item)=>{
+                    item.OnlineID = this.itemOnlineId++;
+                    item.Position = monster.Location.CurrentPosition;
+                    item.Map = monster.Location.Map;
+                    this.itemsInWorld.push(item);
+                });
                 remote.send(packet.make_online_monster_eliminate(monster.ID,monster.ItemPool));
                 // find attack data for if this remote attack this monster
                 let attacking = monster.attackers.find((attacker)=>{return attacker.ID == remote.userdata._id})

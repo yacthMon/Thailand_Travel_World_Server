@@ -55,7 +55,7 @@ class Monster {
         this.ItemDrop.forEach((item) => {
             let chance = (Math.random()) * 100;
             if (chance <= item.Rate) {
-                this.ItemPool.push(item.ItemID);
+                this.ItemPool.push({ItemID : item.ItemID});
             }
         });
     }
