@@ -521,7 +521,7 @@ packet.make_online_monster_reward = (monsterID, attackData) => {
 }
 
 
-packet.make_online_realtime_control = (playerDatas, monsterDatas, monsterHurtDatas) => {
+packet.make_online_realtime_control = (playerDatas, monsterDatas, monsterHurtDatas, changeEquipmentDatas) => {
   let o = new packet_writer(packet.SC_ONLINE_REALTIME_CONTROL);
   // Player
   o.append_uint16(playerDatas.length); //add length first to tell client before loop
@@ -551,7 +551,13 @@ packet.make_online_realtime_control = (playerDatas, monsterDatas, monsterHurtDat
     o.append_uint32(monsterHurtDatas[i].Damage);
     o.append_uint32(monsterHurtDatas[i].HPLeft);
     o.append_int8(monsterHurtDatas[i].KnockbackDirection);
-
+  }
+  // Change Equipment
+  o.append_uint8(changeEquipmentDatas.length);
+  for(let i=0; i< changeEquipmentDatas.length;i++){
+    o.append_uint32(changeEquipmentDatas[i].uid);
+    o.append_int8(changeEquipmentDatas[i].part);
+    o.append_string(changeEquipmentDatas[i].value);
   }
   o.finish();
   return o.buffer;
