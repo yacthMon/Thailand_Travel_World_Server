@@ -267,7 +267,8 @@ packet[packet.CS_SEND_CHECKIN] = (remoteProxy, data) => {
 // 12410
 packet[packet.CS_REQUEST_GET_ITEM] = (remoteProxy,data)=>{
   let itemOnlineID = data.read_uint32();
-  remoteProxy.getOnlineItem(itemOnlineID);
+  let itemID = data.read_uint32();
+  remoteProxy.getOnlineItem(itemOnlineID,itemID);
 }
 // 12450
 packet[packet.CS_CHANGE_EQUIPMENT] = (remoteProxy,data)=>{
@@ -576,9 +577,9 @@ packet.make_online_item_in_world = (itemsInWorld)=>{
   return o.buffer;
 }
 
-packet.make_get_item_grant = (itemOnlineID)=>{
+packet.make_get_item_grant = (itemID)=>{
   let o = new packet_writer(packet.SC_GET_ITEM_GRANT);
-  o.append_uint32(itemOnlineID);
+  o.append_uint32(itemID);
   o.finish()
   return o.buffer;
 }

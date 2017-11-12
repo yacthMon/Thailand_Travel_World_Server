@@ -341,9 +341,9 @@ class RemoteProxy extends server.RemoteProxy {
   }
   // --------- Checkin
   // --------- ItemOnline
-  async getOnlineItem(onlineItemID) {
+  async getOnlineItem(onlineItemID, itemID) {
     if (await world.playerGetItem(this, onlineItemID)) {
-      this.send(packet.make_get_item_grant(onlineItemID));
+      this.send(packet.make_get_item_grant(itemID));
     } else {
       //monitor.log("item not exist in world");
     }
