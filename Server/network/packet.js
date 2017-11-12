@@ -47,6 +47,7 @@ let packet = {
   CS_SEND_CHECKIN: 12400,
   // Item Part
   CS_REQUEST_GET_ITEM: 12410,
+  CS_CHANGE_EQUIPMENT: 12450,
   CS_CHAT: 12101,
   CS_NOTIFICATION: 12102,
 
@@ -267,6 +268,12 @@ packet[packet.CS_SEND_CHECKIN] = (remoteProxy, data) => {
 packet[packet.CS_REQUEST_GET_ITEM] = (remoteProxy,data)=>{
   let itemOnlineID = data.read_uint32();
   remoteProxy.getOnlineItem(itemOnlineID);
+}
+// 12450
+packet[packet.CS_CHANGE_EQUIPMENT] = (remoteProxy,data)=>{
+  let part = data.read_int8();
+  let value = data.read_string();
+  remoteProxy.changeEquipment(part,value);
 }
 
 packet[packet.CS_CHAT] = function (remoteProxy, data) {
