@@ -345,7 +345,7 @@ class RemoteProxy extends server.RemoteProxy {
     if(await world.playerGetItem(this,onlineItemID)){
       this.send(packet.make_get_item_grant(onlineItemID));
     } else {
-      monitor.log("item not exist in world");
+      //monitor.log("item not exist in world");
     }
   }
   // --------- ItemOnline
