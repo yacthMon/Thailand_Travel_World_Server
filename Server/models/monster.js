@@ -137,7 +137,7 @@ class Monster {
             let damagePercent = (attacker.Damage / this.Status.MaxHP);
             let expReceive = damagePercent * this.Status.EXP;
             attacker.EXPReceive = expReceive;
-            monitor.debug("Attacked by " + attacker.ID + " Damage : " + attacker.Damage + " (" + (damagePercent * 100) + "%) EXP Gain : " + expReceive);
+            monitor.debug("Attacked by " + attacker.ID + " Damage : " + attacker.Damage + " (" + (damagePercent * 100) + "%) EXP Gain : " + expReceive + (attacker.Killer?" [Killer]":" [Assits]"));
         })
         world.eliminateMonster(this);
         //        world.eliminateMonster(this.ID, this.Location.Map, this.SpawnerID, this.ItemPool, this.attackers);
