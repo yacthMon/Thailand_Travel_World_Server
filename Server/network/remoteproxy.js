@@ -150,7 +150,7 @@ class RemoteProxy extends server.RemoteProxy {
     }
   }
 
-  async createCharacter(name, gender, job,hair) {
+  async createCharacter(name, gender, job, hair) {
     let data = {
       Name: name,
       Status: {
@@ -183,7 +183,7 @@ class RemoteProxy extends server.RemoteProxy {
         Success: [],
         Process: []
       },
-      CheckIn:[]
+      CheckIn: []
     };
     let result = await db.createCharacter(this.userdata._id, data);
     if (result) {
@@ -308,10 +308,10 @@ class RemoteProxy extends server.RemoteProxy {
   // --------- Monster
   // --------- Quest
 
-  acceptQuest(questID){
+  acceptQuest(questID) {
     let indexOfQuest = this.character.Quest.Process.findIndex((quest) => { return quest.QuestID == questID });
     if (indexOfQuest == -1) {
-      this.character.Quest.Process.push({ "QuestID": questID , "CurrentTotal":0});
+      this.character.Quest.Process.push({ "QuestID": questID, "CurrentTotal": 0 });
     }
   }
 
@@ -336,20 +336,35 @@ class RemoteProxy extends server.RemoteProxy {
   }
   // --------- Quest
   // --------- Checkin
-    checkin(placeID,time){
-      this.character.CheckIn.push({"PlaceID":placeID, "Time":time});
-    }
+  checkin(placeID, time) {
+    this.character.CheckIn.push({ "PlaceID": placeID, "Time": time });
+  }
   // --------- Checkin
   // --------- ItemOnline
-  async getOnlineItem(onlineItemID){
-    if(await world.playerGetItem(this,onlineItemID)){
+  async getOnlineItem(onlineItemID) {
+    if (await world.playerGetItem(this, onlineItemID)) {
       this.send(packet.make_get_item_grant(onlineItemID));
     } else {
-      monitor.log("item not exist in world");
+      //monitor.log("item not exist in world");
     }
   }
+
+  changeEquipment(part, value) {
+    switch (part) {
+      case 1:
+        this.character.Status.Equipment.Head = value
+        break;
+      case 2:
+        this.character.Status.Equipment.Body = value
+        break;
+      case 3:
+        this.character.Status.Equipment.Weapon = value
+        break;
+    }
+    world.playerChangeEquipment(this.userdata._id,part,value);
+  }
   // --------- ItemOnline
-  
+
   chat(msg) {
     console.log('RemoteProxy chat: ' + msg)
     // world.broadcast(packet.make_chat(msg))

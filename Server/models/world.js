@@ -10,6 +10,7 @@ class World {
         this.responsePlayerDatas = [];
         this.responseMonsterDatas = [];
         this.responseMonsterHurtDatas = [];
+        this.responsePlayerChangeEquipment = [];
         this.items = [];
         this.itemOnlineId = 0;
         this.monsterControl = undefined;
@@ -186,6 +187,10 @@ class World {
         return false;
     }
 
+    playerChangeEquipment(uid,part,value){
+        this.responsePlayerChangeEquipment.push({uid:uid, part:part, value:value});
+    }
+
     startQueueResponse() {
         this.responseTimer = setInterval(() => {
             if (this.countPlayer() > 0) {
@@ -200,6 +205,7 @@ class World {
                     let playerDataToSend = [];
                     let monsterDataToSend = [];
                     let monsterHurtDataToSend = [];
+                    let changeEquipmentDataToSend = [];
                     this.responsePlayerDatas.forEach((otherPlayerData) => { // for All response data
                         // if (Math.abs(position.x - data.position.x) <= AOIamount) { //Check if in distance
                         //     tempDatas.push(data); // Add data that in distance to tempData;
@@ -207,6 +213,11 @@ class World {
                         // }
                         if (otherPlayerData.Map == remote.character.Location.Map) { // if otherPlayer in same map
                             playerDataToSend.push(otherPlayerData);
+                            this.responsePlayerChangeEquipment.forEach((data)=>{
+                                if(data.uid == otherPlayerData.UID){
+                                    changeEquipmentDataToSend.push(data);
+                                }
+                            })
                         }
                     });
                     // Monster move data
@@ -225,13 +236,15 @@ class World {
                     //remote.send(packet.make_multiplayer_control(playerDataToSend)); // send temp player data to remote
                     remote.send(packet.make_online_realtime_control(playerDataToSend,
                         monsterDataToSend,
-                        monsterHurtDataToSend));
+                        monsterHurtDataToSend,
+                        changeEquipmentDataToSend));
                 })
                 // ---------------- AOI (Area of Interest) --------          
                 // After we done sending data we clear old data   
                 this.responsePlayerDatas.length = 0;
                 this.responseMonsterDatas.length = 0;
                 this.responseMonsterHurtDatas.length = 0;
+                this.responsePlayerChangeEquipment.length = 0;
             } else {
                 // console.log("[World] No one in this world");
             }

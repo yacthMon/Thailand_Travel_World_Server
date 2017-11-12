@@ -47,6 +47,7 @@ let packet = {
   CS_SEND_CHECKIN: 12400,
   // Item Part
   CS_REQUEST_GET_ITEM: 12410,
+  CS_CHANGE_EQUIPMENT: 12450,
   CS_CHAT: 12101,
   CS_NOTIFICATION: 12102,
 
@@ -267,6 +268,12 @@ packet[packet.CS_SEND_CHECKIN] = (remoteProxy, data) => {
 packet[packet.CS_REQUEST_GET_ITEM] = (remoteProxy,data)=>{
   let itemOnlineID = data.read_uint32();
   remoteProxy.getOnlineItem(itemOnlineID);
+}
+// 12450
+packet[packet.CS_CHANGE_EQUIPMENT] = (remoteProxy,data)=>{
+  let part = data.read_int8();
+  let value = data.read_string();
+  remoteProxy.changeEquipment(part,value);
 }
 
 packet[packet.CS_CHAT] = function (remoteProxy, data) {
@@ -514,7 +521,7 @@ packet.make_online_monster_reward = (monsterID, attackData) => {
 }
 
 
-packet.make_online_realtime_control = (playerDatas, monsterDatas, monsterHurtDatas) => {
+packet.make_online_realtime_control = (playerDatas, monsterDatas, monsterHurtDatas, changeEquipmentDatas) => {
   let o = new packet_writer(packet.SC_ONLINE_REALTIME_CONTROL);
   // Player
   o.append_uint16(playerDatas.length); //add length first to tell client before loop
@@ -544,7 +551,13 @@ packet.make_online_realtime_control = (playerDatas, monsterDatas, monsterHurtDat
     o.append_uint32(monsterHurtDatas[i].Damage);
     o.append_uint32(monsterHurtDatas[i].HPLeft);
     o.append_int8(monsterHurtDatas[i].KnockbackDirection);
-
+  }
+  // Change Equipment
+  o.append_uint8(changeEquipmentDatas.length);
+  for(let i=0; i< changeEquipmentDatas.length;i++){
+    o.append_uint32(changeEquipmentDatas[i].uid);
+    o.append_int8(changeEquipmentDatas[i].part);
+    o.append_string(changeEquipmentDatas[i].value);
   }
   o.finish();
   return o.buffer;
