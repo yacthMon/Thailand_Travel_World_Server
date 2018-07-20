@@ -1,9 +1,0 @@
-{
-    "Database": {
-        "ip": "188.166.208.125",
-        "port": "27017",
-        "user": "TTW",
-        "password": "thailandTravelworld",
-        "database": "TTW"
-    }
-}
