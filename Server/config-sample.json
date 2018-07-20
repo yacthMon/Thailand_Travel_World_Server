@@ -1,0 +1,9 @@
+{
+    "Database": {
+        "ip": "localhost",
+        "port": "27017",
+        "user": "TTW",
+        "password": "thailandTravelworld",
+        "database": "TTW"
+    }
+}
